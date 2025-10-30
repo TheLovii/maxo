@@ -1,0 +1,38 @@
+from logging import getLogger
+from typing import Optional
+
+from maxo.enums import ChatType
+
+from maxo_dialog import ChatEvent
+from maxo_dialog.api.entities import (
+    Context,
+    Stack,
+)
+from maxo_dialog.api.protocols import StackAccessValidator
+
+logger = getLogger(__name__)
+
+
+class DefaultAccessValidator(StackAccessValidator):
+    async def is_allowed(
+            self,
+            stack: Stack,
+            context: Optional[Context],
+            event: ChatEvent,
+            data: dict,
+    ) -> bool:
+        if context:
+            access_settings = context.access_settings
+        else:
+            access_settings = stack.access_settings
+
+        if not access_settings:
+            return True
+        chat = data["event_chat"]
+        if chat.type is ChatType.PRIVATE:
+            return True
+        if access_settings.user_ids:
+            user = data["event_from_user"]
+            if user.id not in access_settings.user_ids:
+                return False
+        return True

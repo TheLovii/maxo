@@ -1,0 +1,36 @@
+from dataclasses import dataclass
+from typing import Optional, Union
+
+from maxo import Bot
+from maxo.types import (
+    Callback,
+    Chat,
+    ChatJoinRequest,
+    ChatMemberUpdated,
+    ErrorEvent,
+    Message,
+    User,
+)
+
+from .update_event import DialogUpdateEvent
+
+ChatEvent = Union[
+    Callback,
+    ChatJoinRequest,
+    ChatMemberUpdated,
+    DialogUpdateEvent,
+    ErrorEvent,
+    Message,
+]
+
+
+@dataclass
+class EventContext:
+    bot: Bot
+    chat: Chat
+    user: User
+    thread_id: Optional[int]
+    business_connection_id: Optional[str]
+
+
+EVENT_CONTEXT_KEY = "aiogd_event_context"
