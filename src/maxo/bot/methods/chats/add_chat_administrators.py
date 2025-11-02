@@ -4,7 +4,7 @@ from retejo.http.markers import Body, UrlVar
 
 from maxo.bot.method_results.chats.add_chat_administrators import AddChatAdministratorsResult
 from maxo.bot.methods.base import MaxoMethod
-from maxo.types.api.chat_admin import ChatAdmin
+from maxo.types.chat_admin import ChatAdmin
 
 
 class AddChatAdministrators(MaxoMethod[AddChatAdministratorsResult]):

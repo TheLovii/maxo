@@ -7,11 +7,11 @@ from typing import (
     Union,
 )
 
+from maxo.enums import ChatType
 from maxo.fsm import State, StatesGroup
 from maxo.routing.interfaces import Router
 from maxo.types.api import Callback, Chat
-from maxo.types.api.message import Message
-from maxo.types.enums import ChatType
+from maxo.types.message import Message
 from maxo_dialog.api.entities import Context, Data, LaunchMode, NewMessage
 from maxo_dialog.api.exceptions import (
     UnregisteredWindowError,

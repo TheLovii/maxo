@@ -2,7 +2,7 @@ from logging import getLogger
 from typing import Optional, Union
 
 from maxo.types import Callback, CallbackKeyboardButton, Chat, MessageKeyboardButton, User
-from maxo.types.api.message import Message
+from maxo.types.message import Message
 from maxo_dialog.api.entities import (
     ChatEvent,
     DialogUpdateEvent,

@@ -1,7 +1,7 @@
 from typing import assert_never
 
+from maxo.enums import ChatType
 from maxo.omit import Omittable, Omitted
-from maxo.types.enums.chat_type import ChatType
 
 
 def calculate_chat_id_and_user_id(

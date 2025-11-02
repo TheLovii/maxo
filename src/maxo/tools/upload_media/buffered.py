@@ -1,5 +1,5 @@
+from maxo.enums import UploadType
 from maxo.tools.upload_media.base import UploadMedia
-from maxo.types.enums.upload_type import UploadType
 
 
 class BufferedUploadMedia(UploadMedia):

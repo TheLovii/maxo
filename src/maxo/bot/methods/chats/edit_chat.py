@@ -2,8 +2,8 @@ from retejo.core.markers import Omittable, Omitted
 from retejo.http.markers import Body, UrlVar
 
 from maxo.bot.methods.base import MaxoMethod
-from maxo.types.api.chat import Chat
-from maxo.types.api.photo_attachment_request_payload import PhotoAttachmentRequestPayload
+from maxo.types.chat import Chat
+from maxo.types.photo_attachment_request_payload import PhotoAttachmentRequestPayload
 
 
 class EditChat(MaxoMethod[Chat]):

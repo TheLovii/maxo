@@ -1,5 +1,5 @@
-from maxo.types.api.chat import Chat
 from maxo.types.base import MaxoType
+from maxo.types.chat import Chat
 
 
 class GetChatsResult(MaxoType):

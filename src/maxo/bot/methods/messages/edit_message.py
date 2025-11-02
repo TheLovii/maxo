@@ -4,10 +4,10 @@ from retejo.http.markers import Body, QueryParam
 
 from maxo.bot.method_results.messages.edit_message import EditMessageResult
 from maxo.bot.methods.base import MaxoMethod
+from maxo.enums import TextFormat
 from maxo.omit import Omittable, Omitted
-from maxo.types.api.new_message_link import NewMessageLink
-from maxo.types.api.request_attachments import AttachmentsRequests
-from maxo.types.enums import TextFormat
+from maxo.types.new_message_link import NewMessageLink
+from maxo.types.request_attachments import AttachmentsRequests
 
 
 class EditMessage(MaxoMethod[EditMessageResult]):

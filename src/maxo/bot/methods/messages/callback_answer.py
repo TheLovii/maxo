@@ -3,7 +3,7 @@ from retejo.http.markers import Body, QueryParam
 from maxo.bot.method_results.messages.callback_answer import CallbackAnswerResult
 from maxo.bot.methods.base import MaxoMethod
 from maxo.omit import Omittable, Omitted
-from maxo.types.api.new_message_body import NewMessageBody
+from maxo.types.new_message_body import NewMessageBody
 
 
 class CallbackAnswer(MaxoMethod[CallbackAnswerResult]):

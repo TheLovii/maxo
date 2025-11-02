@@ -2,9 +2,9 @@ from retejo.core.markers import Omittable, Omitted
 from retejo.http.markers import Body
 
 from maxo.bot.methods.base import MaxoMethod
-from maxo.types.api.bot_command import BotCommand
-from maxo.types.api.bot_info import BotInfo
-from maxo.types.api.photo_attachment_request_payload import PhotoAttachmentRequestPayload
+from maxo.types.bot_command import BotCommand
+from maxo.types.bot_info import BotInfo
+from maxo.types.photo_attachment_request_payload import PhotoAttachmentRequestPayload
 
 
 class EditBotInfo(MaxoMethod[BotInfo]):

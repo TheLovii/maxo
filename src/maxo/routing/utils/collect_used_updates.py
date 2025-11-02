@@ -1,8 +1,8 @@
 from typing import Sequence, overload
 
+from maxo.enums import UpdateType
 from maxo.routing.interfaces.router import Router
 from maxo.routing.updates.base import MaxUpdate
-from maxo.types.enums.update_type import UpdateType
 
 
 def _collect_used_updates_type(router: Router) -> set[UpdateType]:

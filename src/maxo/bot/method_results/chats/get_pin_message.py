@@ -1,6 +1,6 @@
 from maxo.omit import Omittable, Omitted
-from maxo.types.api.message import Message
 from maxo.types.base import MaxoType
+from maxo.types.message import Message
 
 
 class GetPinMessageResult(MaxoType):

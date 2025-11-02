@@ -3,7 +3,7 @@ from typing import Protocol
 
 from maxo.bot.api_client import MaxApiClient
 from maxo.errors.state import StateError
-from maxo.types.api.bot_info import BotInfo
+from maxo.types.bot_info import BotInfo
 
 
 class BotState(Protocol):

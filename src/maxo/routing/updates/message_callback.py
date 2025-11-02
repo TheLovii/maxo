@@ -1,12 +1,12 @@
 from datetime import datetime
 
+from maxo.enums import UpdateType
 from maxo.errors.types import AttributeIsEmptyError
 from maxo.omit import Omittable, Omitted
 from maxo.routing.updates.base import MaxUpdate
-from maxo.types.api.callback import Callback
-from maxo.types.api.message import Message
-from maxo.types.api.user import User
-from maxo.types.enums.update_type import UpdateType
+from maxo.types.callback import Callback
+from maxo.types.message import Message
+from maxo.types.user import User
 
 
 class MessageCallback(MaxUpdate):

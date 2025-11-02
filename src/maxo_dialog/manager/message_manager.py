@@ -2,6 +2,7 @@ from logging import getLogger
 from typing import Optional, Union
 
 from maxo import Bot
+from maxo.enums import AttachmentType
 from maxo.exceptions import TelegramAPIError, TelegramBadRequest
 from maxo.types import (
     Callback,
@@ -17,7 +18,6 @@ from maxo.types import (
     ReplyKeyboardRemove,
     URLInputFile,
 )
-from maxo.types.enums import AttachmentType
 from maxo_dialog.api.entities import (
     MediaAttachment,
     MediaId,

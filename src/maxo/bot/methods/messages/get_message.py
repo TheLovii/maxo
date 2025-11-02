@@ -1,7 +1,7 @@
 from retejo.http.markers import UrlVar
 
 from maxo.bot.methods.base import MaxoMethod
-from maxo.types.api.message import Message
+from maxo.types.message import Message
 
 
 class GetMessage(MaxoMethod[Message]):

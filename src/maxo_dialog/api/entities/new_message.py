@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Optional, Union
 
+from maxo.enums import AttachmentType
 from maxo.types import (
     Chat,
     ForceReply,
@@ -10,7 +11,6 @@ from maxo.types import (
     ReplyKeyboardMarkup,
     ReplyKeyboardRemove,
 )
-from maxo.types.enums import AttachmentType
 from maxo_dialog.api.entities import MediaAttachment, ShowMode
 
 MarkupVariant = Union[

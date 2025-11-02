@@ -4,6 +4,7 @@ from logging import getLogger
 from typing import Any, Optional, Union, cast
 
 from maxo import Router
+from maxo.enums import ChatType
 from maxo.fsm import State
 from maxo.types import (
     Callback,
@@ -13,7 +14,6 @@ from maxo.types import (
     ReplyKeyboardMarkup,
     User,
 )
-from maxo.types.enums import ChatType
 from maxo_dialog.api.entities import (
     DEFAULT_STACK_ID,
     EVENT_CONTEXT_KEY,

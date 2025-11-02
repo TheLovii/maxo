@@ -4,6 +4,7 @@ import os
 from magic_filter import F
 
 from maxo import Bot, Dispatcher, SimpleRouter
+from maxo.enums import TextFormat
 from maxo.fsm import FSMContext, State, StateFilter, StatesGroup
 from maxo.integrations.magic_filter import MagicFilter
 from maxo.routing.ctx import Ctx
@@ -12,7 +13,6 @@ from maxo.routing.updates.message_created import MessageCreated
 from maxo.routing.utils import inline_ctx
 from maxo.tools.facades import MessageCreatedFacade
 from maxo.tools.long_polling.long_polling import LongPolling
-from maxo.types.enums import TextFormat
 
 router = SimpleRouter(__name__)
 

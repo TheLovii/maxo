@@ -1,7 +1,7 @@
 from retejo.http.markers import UrlVar
 
 from maxo.bot.methods.base import MaxoMethod
-from maxo.types.api.video_info import VideoInfo
+from maxo.types.video_info import VideoInfo
 
 
 class GetVideoInfo(MaxoMethod[VideoInfo]):

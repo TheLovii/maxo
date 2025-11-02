@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from maxo.types.enums.upload_type import UploadType
+from maxo.enums import UploadType
 
 
 class UploadMedia(ABC):

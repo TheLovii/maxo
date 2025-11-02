@@ -2,7 +2,7 @@ from retejo.http.markers import QueryParam
 
 from maxo.bot.method_results.upload.get_download_link import GetDownloadLinkResult
 from maxo.bot.methods.base import MaxoMethod
-from maxo.types.enums.upload_type import UploadType
+from maxo.enums import UploadType
 
 
 class GetDownloadLink(MaxoMethod[GetDownloadLinkResult]):

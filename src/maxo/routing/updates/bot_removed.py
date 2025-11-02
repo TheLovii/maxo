@@ -1,8 +1,8 @@
 from datetime import datetime
 
+from maxo.enums import UpdateType
 from maxo.routing.updates.base import MaxUpdate
-from maxo.types.api.user import User
-from maxo.types.enums.update_type import UpdateType
+from maxo.types.user import User
 
 
 class BotRemoved(MaxUpdate):

@@ -4,7 +4,7 @@ from typing import Self, Sequence, cast
 
 from maxo.bot.bot import Bot
 from maxo.omit import Omittable, Omitted
-from maxo.types.api.chat_member import ChatMember
+from maxo.types.chat_member import ChatMember
 
 
 class ChatMembersIterator(AsyncIterator[ChatMember]):

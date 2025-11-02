@@ -3,22 +3,20 @@ from abc import ABC, abstractmethod
 from collections.abc import Sequence
 
 from maxo.bot.method_results.messages.delete_message import DeleteMessageResult
+from maxo.enums import MessageLinkType, TextFormat, UploadType
 from maxo.omit import Omittable, Omitted
 from maxo.tools.facades.methods.base import BaseMethodsFacade
 from maxo.tools.facades.methods.upload_media import UploadMediaFacade
 from maxo.tools.helpers.calculating import calculate_chat_id_and_user_id
 from maxo.tools.upload_media import UploadMedia
-from maxo.types.api.inline_keyboard_attachment_request import InlineKeyboardAttachmentRequest
-from maxo.types.api.inline_keyboard_attachment_request_payload import (
+from maxo.types.inline_keyboard_attachment_request import InlineKeyboardAttachmentRequest
+from maxo.types.inline_keyboard_attachment_request_payload import (
     InlineKeyboardAttachmentRequestPayload,
 )
-from maxo.types.api.keyboard_buttons import KeyboardButtons
-from maxo.types.api.message import Message
-from maxo.types.api.new_message_link import NewMessageLink
-from maxo.types.api.request_attachments import AttachmentsRequests, MediaAttachmentsRequests
-from maxo.types.enums import TextFormat
-from maxo.types.enums.message_link_type import MessageLinkType
-from maxo.types.enums.upload_type import UploadType
+from maxo.types.keyboard_buttons import KeyboardButtons
+from maxo.types.message import Message
+from maxo.types.new_message_link import NewMessageLink
+from maxo.types.request_attachments import AttachmentsRequests, MediaAttachmentsRequests
 
 
 class MessageMethodsFacade(BaseMethodsFacade, ABC):

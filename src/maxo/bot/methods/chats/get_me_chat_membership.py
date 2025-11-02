@@ -1,7 +1,7 @@
 from retejo.http.markers import UrlVar
 
 from maxo.bot.methods.base import MaxoMethod
-from maxo.types.api.chat_membership import ChatMembership
+from maxo.types.chat_membership import ChatMembership
 
 
 class GetMeChatMembership(MaxoMethod[ChatMembership]):

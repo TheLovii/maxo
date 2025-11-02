@@ -104,7 +104,7 @@ class Ctx(GenericExtensions[_UpdateT, _CtxDataT]):
         from maxo.fsm.storages.base import BaseStorage
         from maxo.tools.dispatcher import Dispatcher
         from maxo.tools.facades.updates.base import BaseUpdateFacade
-        from maxo.types.api.update_context import UpdateContext
+        from maxo.types.update_context import UpdateContext
 
         update: _UpdateT
         update_tp: type[_UpdateT]

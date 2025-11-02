@@ -15,7 +15,7 @@ from maxo import (
 from maxo.fsm import State, StatesGroup
 from maxo.routing.interfaces import Router
 from maxo.types.api import Callback, Chat, User
-from maxo.types.api.message import Message
+from maxo.types.message import Message
 from maxo_dialog import (
     BaseDialogManager,
     Dialog,

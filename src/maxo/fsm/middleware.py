@@ -7,7 +7,7 @@ from maxo.fsm.storages.base import BaseStorage
 from maxo.routing.ctx import Ctx
 from maxo.routing.interfaces.middleware import Middleware, NextMiddleware
 from maxo.routing.signals.update import Update
-from maxo.types.api.update_context import UpdateContext
+from maxo.types.update_context import UpdateContext
 
 
 class FSMContextMiddleware(Middleware[Update[Any]]):

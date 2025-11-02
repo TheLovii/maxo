@@ -1,5 +1,5 @@
 from maxo.bot.methods.base import MaxoMethod
-from maxo.types.api.bot_info import BotInfo
+from maxo.types.bot_info import BotInfo
 
 
 class GetBotInfo(MaxoMethod[BotInfo]):

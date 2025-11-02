@@ -11,6 +11,7 @@ from retejo.marker_tools import for_marker
 from maxo._internal._adaptix.concat_provider import concat_provider
 from maxo._internal._adaptix.has_tag_provider import has_tag_provider
 from maxo.bot.warming_up import WarmingUpType, warming_up_retort
+from maxo.enums import AttachmentRequestType, AttachmentType, KeyboardButtonType, MarkupElementType
 from maxo.errors.api import (
     MaxBotBadRequestError,
     MaxBotMethodNotAllowedError,
@@ -32,22 +33,22 @@ from maxo.routing.updates.message_edited import MessageEdited
 from maxo.routing.updates.message_removed import MessageRemoved
 from maxo.routing.updates.user_added import UserAdded
 from maxo.routing.updates.user_removed import UserRemoved
-from maxo.types.api.audio_attachment import AudioAttachment
-from maxo.types.api.audio_attachment_request import AudioAttachmentRequest
-from maxo.types.api.callback_keyboard_button import CallbackKeyboardButton
-from maxo.types.api.chat_keyboard_button import ChatKeyboardButton
-from maxo.types.api.contact_attachment import ContactAttachment
-from maxo.types.api.contact_attachment_request import ContactAttachmentRequest
-from maxo.types.api.file_attachment import FileAttachment
-from maxo.types.api.file_attachment_request import FileAttachmentRequest
-from maxo.types.api.image_attachment import ImageAttachment
-from maxo.types.api.image_attachment_request import ImageAttachmentRequest
-from maxo.types.api.inline_keyboard_attachment_request import InlineKeyboardAttachmentRequest
-from maxo.types.api.keyboard import Keyboard
-from maxo.types.api.link_keyboard_button import LinkKeyboardButton
-from maxo.types.api.location_attachment import LocationAttachment
-from maxo.types.api.location_attachment_request import LocationAttachmentRequest
-from maxo.types.api.markup_elements import (
+from maxo.types.audio_attachment import AudioAttachment
+from maxo.types.audio_attachment_request import AudioAttachmentRequest
+from maxo.types.callback_keyboard_button import CallbackKeyboardButton
+from maxo.types.chat_keyboard_button import ChatKeyboardButton
+from maxo.types.contact_attachment import ContactAttachment
+from maxo.types.contact_attachment_request import ContactAttachmentRequest
+from maxo.types.file_attachment import FileAttachment
+from maxo.types.file_attachment_request import FileAttachmentRequest
+from maxo.types.image_attachment import ImageAttachment
+from maxo.types.image_attachment_request import ImageAttachmentRequest
+from maxo.types.inline_keyboard_attachment_request import InlineKeyboardAttachmentRequest
+from maxo.types.keyboard import Keyboard
+from maxo.types.link_keyboard_button import LinkKeyboardButton
+from maxo.types.location_attachment import LocationAttachment
+from maxo.types.location_attachment_request import LocationAttachmentRequest
+from maxo.types.markup_elements import (
     EmphasizedMarkupElement,
     HeadingMarkupElement,
     HighlightedMarkupElement,
@@ -58,20 +59,16 @@ from maxo.types.api.markup_elements import (
     UnderlineMarkupElement,
     UserMentionMarkupElement,
 )
-from maxo.types.api.message_keyboard_button import MessageKeyboardButton
-from maxo.types.api.open_app_keyboard_button import OpenAppKeyboardButton
-from maxo.types.api.request_contact_keyboard_button import RequestContactKeyboardButton
-from maxo.types.api.request_geo_location_button import RequestGeoLocationKeyboardButton
-from maxo.types.api.share_attachment import ShareAttachment
-from maxo.types.api.share_attachment_request import ShareAttachmentRequest
-from maxo.types.api.sticker_attachment import StickerAttachment
-from maxo.types.api.sticker_attachment_request import StickerAttachmentRequest
-from maxo.types.api.video_attachment import VideoAttachment
-from maxo.types.api.video_attachment_request import VideoAttachmentRequest
-from maxo.types.enums.attachment_request_type import AttachmentRequestType
-from maxo.types.enums.attachment_type import AttachmentType
-from maxo.types.enums.keyboard_button_type import KeyboardButtonType
-from maxo.types.enums.markup_element_type import MarkupElementType
+from maxo.types.message_keyboard_button import MessageKeyboardButton
+from maxo.types.open_app_keyboard_button import OpenAppKeyboardButton
+from maxo.types.request_contact_keyboard_button import RequestContactKeyboardButton
+from maxo.types.request_geo_location_button import RequestGeoLocationKeyboardButton
+from maxo.types.share_attachment import ShareAttachment
+from maxo.types.share_attachment_request import ShareAttachmentRequest
+from maxo.types.sticker_attachment import StickerAttachment
+from maxo.types.sticker_attachment_request import StickerAttachmentRequest
+from maxo.types.video_attachment import VideoAttachment
+from maxo.types.video_attachment_request import VideoAttachmentRequest
 
 _has_tag_providers = concat_provider(
     # ---> UpdateType <---

@@ -1,7 +1,7 @@
 from logging import getLogger
 from typing import Optional
 
-from maxo.types.enums import ChatType
+from maxo.enums import ChatType
 from maxo_dialog import ChatEvent
 from maxo_dialog.api.entities import (
     Context,

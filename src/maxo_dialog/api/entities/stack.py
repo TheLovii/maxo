@@ -4,8 +4,8 @@ import time
 from dataclasses import dataclass, field
 from typing import Optional
 
+from maxo.enums import AttachmentType
 from maxo.fsm import State
-from maxo.types.enums import AttachmentType
 from maxo_dialog.api.exceptions import DialogStackOverflow
 
 from .access import AccessSettings

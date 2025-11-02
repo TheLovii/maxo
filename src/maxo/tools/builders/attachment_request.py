@@ -4,17 +4,17 @@ from decimal import Decimal
 from typing import Self, overload
 
 from maxo.omit import Omittable, Omitted
-from maxo.types.api.audio_attachment_request import AudioAttachmentRequest
-from maxo.types.api.contact_attachment_request import ContactAttachmentRequest
-from maxo.types.api.file_attachment_request import FileAttachmentRequest
-from maxo.types.api.image_attachment_request import ImageAttachmentRequest
-from maxo.types.api.inline_keyboard_attachment_request import InlineKeyboardAttachmentRequest
-from maxo.types.api.keyboard_buttons import KeyboardButtons
-from maxo.types.api.location_attachment_request import LocationAttachmentRequest
-from maxo.types.api.request_attachments import AttachmentsRequests
-from maxo.types.api.share_attachment_request import ShareAttachmentRequest
-from maxo.types.api.sticker_attachment_request import StickerAttachmentRequest
-from maxo.types.api.video_attachment_request import VideoAttachmentRequest
+from maxo.types.audio_attachment_request import AudioAttachmentRequest
+from maxo.types.contact_attachment_request import ContactAttachmentRequest
+from maxo.types.file_attachment_request import FileAttachmentRequest
+from maxo.types.image_attachment_request import ImageAttachmentRequest
+from maxo.types.inline_keyboard_attachment_request import InlineKeyboardAttachmentRequest
+from maxo.types.keyboard_buttons import KeyboardButtons
+from maxo.types.location_attachment_request import LocationAttachmentRequest
+from maxo.types.request_attachments import AttachmentsRequests
+from maxo.types.share_attachment_request import ShareAttachmentRequest
+from maxo.types.sticker_attachment_request import StickerAttachmentRequest
+from maxo.types.video_attachment_request import VideoAttachmentRequest
 
 
 class AttachmentRequestBuilder:
