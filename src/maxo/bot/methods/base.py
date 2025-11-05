@@ -1,7 +1,7 @@
 from typing import Generic, TypeVar
 
+from retejo.http.markers import Header
 from retejo.http.entities import HttpMethod
-from retejo.http.markers import QueryParam
 
 from maxo.omit import Omittable, Omitted
 
@@ -17,4 +17,4 @@ class MaxoMethod(HttpMethod[_MethodResultT], Generic[_MethodResultT]):
 
     """
 
-    access_token: QueryParam[Omittable[str]] = Omitted()
+    access_token: Header[Omittable[str]] = Omitted()

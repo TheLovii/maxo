@@ -16,9 +16,7 @@ from maxo.tools.facades import MessageCallbackFacade, MessageCreatedFacade
 from maxo.types import Callback, Chat
 from maxo.types.message import Message
 from maxo_dialog.api.entities import Context, Data, LaunchMode, NewMessage
-from maxo_dialog.api.exceptions import (
-    UnregisteredWindowError,
-)
+from maxo_dialog.api.exceptions import UnregisteredWindowError
 from maxo_dialog.api.internal import Widget, WindowProtocol
 from maxo_dialog.api.protocols import (
     CancelEventProcessing,

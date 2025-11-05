@@ -1,11 +1,24 @@
 from datetime import datetime
 from typing import Any
 
-from adaptix import P, Retort, dumper, loader
+from adaptix import dumper, P, Retort, loader
 from aiohttp import ClientResponse
+from retejo.core import AdaptixFactory, Factory, RequestContextProxy
+from retejo.http import (
+    http_method_dumper_provider,
+    HttpMethod,
+    HttpRequest,
+    http_response_loader_provider,
+)
 from retejo.http.clients.aiohttp import AiohttpClient
 from retejo.http.entities import HttpResponse
-from retejo.http.markers import QueryParamMarker
+from retejo.http.markers import (
+    BodyMarker,
+    FormMarker,
+    HeaderMarker,
+    QueryParamMarker,
+    UrlVarMarker,
+)
 from retejo.marker_tools import for_marker
 
 from maxo._internal._adaptix.concat_provider import concat_provider
@@ -38,6 +51,7 @@ from maxo.routing.updates.message_edited import MessageEdited
 from maxo.routing.updates.message_removed import MessageRemoved
 from maxo.routing.updates.user_added import UserAdded
 from maxo.routing.updates.user_removed import UserRemoved
+from maxo.types import InlineKeyboardAttachment
 from maxo.types.audio_attachment import AudioAttachment
 from maxo.types.audio_attachment_request import AudioAttachmentRequest
 from maxo.types.callback_keyboard_button import CallbackKeyboardButton
@@ -95,7 +109,7 @@ _has_tag_providers = concat_provider(
     has_tag_provider(ContactAttachment, "type", AttachmentType.CONTACT),
     has_tag_provider(FileAttachment, "type", AttachmentType.FILE),
     has_tag_provider(ImageAttachment, "type", AttachmentType.IMAGE),
-    has_tag_provider(Keyboard, "type", AttachmentType.INLINE_KEYBOARD),
+    has_tag_provider(InlineKeyboardAttachment, "type", AttachmentType.INLINE_KEYBOARD),
     has_tag_provider(LocationAttachment, "type", AttachmentType.LOCATION),
     has_tag_provider(ShareAttachment, "type", AttachmentType.SHARE),
     has_tag_provider(StickerAttachment, "type", AttachmentType.STICKER),
@@ -159,43 +173,57 @@ class MaxApiClient(AiohttpClient):
         token: str,
         warming_up: bool,
     ) -> None:
+        self._token = token
         self._warming_up = warming_up
-        super().__init__(
-            base_url="https://botapi.max.ru/",
-            headers={"Authorization": token},
-        )
+        super().__init__(base_url="https://platform-api.max.ru/")
 
-    def init_method_dumper(self) -> Retort:
-        retort = (
-            super()
-            .init_method_dumper()
-            .extend(
-                recipe=[
-                    _has_tag_providers,
-                    dumper(
-                        for_marker(P[None], QueryParamMarker),
-                        lambda x: "null",
-                    ),
-                ]
-            )
-        )
-        return warming_up_retort(
-            retort, warming_up=WarmingUpType.METHOD if self._warming_up else None
-        )
-
-    def init_response_loader(self) -> Retort:
-        retort = (
-            super()
-            .init_response_loader()
-            .extend(
-                recipe=(
-                    _has_tag_providers,
-                    loader(P[datetime], lambda x: datetime.fromtimestamp(x / 1000)),
+    def init_method_dumper(self) -> Factory:
+        retort = Retort(
+            recipe=[
+                http_method_dumper_provider(),
+                _has_tag_providers,
+                dumper(
+                    for_marker(QueryParamMarker, P[None]),
+                    lambda x: "null",
                 ),
-            )
+            ]
         )
-        return warming_up_retort(
-            retort, warming_up=WarmingUpType.TYPES if self._warming_up else None
+        if self._warming_up:
+            retort = warming_up_retort(retort, warming_up=WarmingUpType.METHOD)
+        return AdaptixFactory(retort)
+
+    def init_response_loader(self) -> Factory:
+        retort = Retort(
+            recipe=[
+                http_response_loader_provider(),
+                _has_tag_providers,
+                loader(P[datetime], lambda x: datetime.fromtimestamp(x / 1000)),
+            ]
+        )
+        if self._warming_up:
+            retort = warming_up_retort(retort, warming_up=WarmingUpType.TYPES)
+        return AdaptixFactory(retort)
+
+    def method_to_request(self, method: HttpMethod[Any]) -> HttpRequest:
+        request_context = RequestContextProxy(self._method_dumper.dump(method))
+
+        url_vars = request_context.get(UrlVarMarker)
+        if url_vars is None:
+            url = method.__url__
+        else:
+            url = method.__url__.format_map(url_vars)
+
+        headers: dict[str, Any] = request_context.get(HeaderMarker) or {}
+        headers["Authorization"] = headers.get("Authorization", self._token)
+
+        return HttpRequest(
+            url=url,
+            http_method=method.__http_method__,
+            body=request_context.get(BodyMarker),
+            headers=headers,
+            query_params=request_context.get(QueryParamMarker),
+            form=request_context.get(FormMarker),
+            context=request_context,
         )
 
     async def retrieve_response_data(

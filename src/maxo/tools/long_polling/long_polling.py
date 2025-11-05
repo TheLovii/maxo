@@ -124,7 +124,7 @@ class LongPolling:
                 )
             except Exception as exception:
                 failed = True
-                loggers.dispatcher.error(
+                loggers.dispatcher.exception(
                     "Failed to fetch updates - %s: %s",
                     type(exception).__name__,
                     exception,

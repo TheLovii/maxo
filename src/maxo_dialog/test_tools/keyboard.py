@@ -44,7 +44,7 @@ class InlineButtonPositionLocator:
         if not message.unsafe_body.keyboard:
             return None
         try:
-            return message.unsafe_body.keyboard.buttons[self.row][self.column]
+            return message.unsafe_body.keyboard.payload.buttons[self.row][self.column]
         except IndexError:
             return None
 

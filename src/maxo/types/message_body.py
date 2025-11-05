@@ -1,4 +1,5 @@
 from maxo.omit import Omittable, Omitted
+from maxo.types import InlineKeyboardAttachment
 from maxo.types.attachments import Attachments
 from maxo.types.base import MaxoType
 from maxo.types.keyboard import Keyboard
@@ -33,6 +34,6 @@ class MessageBody(MaxoType):
         if not self.attachments:
             return None
         for attachment in self.attachments:
-            if isinstance(attachment, Keyboard):
-                return attachment
+            if isinstance(attachment, InlineKeyboardAttachment):
+                return attachment.payload
         return None

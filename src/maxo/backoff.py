@@ -36,7 +36,7 @@ class Backoff:
 
     @property
     def counter(self) -> int:
-        return self.counter
+        return self._counter
 
     @property
     def current_delay(self) -> float:
