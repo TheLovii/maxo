@@ -139,6 +139,7 @@ class SimpleRouter(Router):
             result = await child_router.trigger(ctx)
             if result is UNHANDLED:
                 continue
+            return result
         return UNHANDLED
 
     async def trigger(self, ctx: Ctx) -> Any:
@@ -156,8 +157,7 @@ class SimpleRouter(Router):
         result = await chain_middlewares(ctx)
         if result is UNHANDLED:
             return await self.trigger_child(ctx)
-        else:
-            return result
+        return result
 
     async def _emit_before_startup_handler(
         self,

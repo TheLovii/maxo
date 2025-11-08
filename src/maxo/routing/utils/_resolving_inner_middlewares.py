@@ -47,4 +47,4 @@ def resolving_inner_middlewares(
     resolve_middlewares(router, middlewares_map)
 
     for children_router in router.children_routers:
-        resolving_inner_middlewares(children_router, middlewares_map)
+        resolving_inner_middlewares(children_router, {**middlewares_map})
