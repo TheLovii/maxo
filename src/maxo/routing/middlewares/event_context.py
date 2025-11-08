@@ -13,12 +13,12 @@ class EventContextMiddleware(BaseMiddleware[Update[Any]]):
     async def __call__(
         self,
         update: Update[Any],
-        ctx: Ctx[Update[Any]],
+        ctx: Ctx,
         next: NextMiddleware[Update[Any]],
     ) -> Any:
         user = self._resolve_event_context(update.update)
         if user:
-            setattr(ctx, EVENT_FROM_USER_KEY, user)
+            ctx[EVENT_FROM_USER_KEY] = user
         return await next(ctx)
 
     def _resolve_event_context(

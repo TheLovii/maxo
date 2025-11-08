@@ -99,7 +99,7 @@ class ManagerImpl(DialogManager):
     @property
     def middleware_data(self) -> dict:
         """Middleware data."""
-        return self._ctx.raw_data
+        return self._ctx
 
     @property
     def dialog_data(self) -> dict:
@@ -149,7 +149,7 @@ class ManagerImpl(DialogManager):
         return context
 
     def _current_context_unsafe(self) -> Optional[Context]:
-        return getattr(self._ctx, CONTEXT_KEY, None)
+        return self._ctx.get(CONTEXT_KEY)
 
     def has_context(self) -> bool:
         self.check_disabled()
@@ -157,16 +157,16 @@ class ManagerImpl(DialogManager):
 
     def current_stack(self) -> Stack:
         self.check_disabled()
-        return getattr(self._ctx, STACK_KEY)
+        return self._ctx[STACK_KEY]
 
     def storage(self) -> StorageProxy:
-        return getattr(self._ctx, STORAGE_KEY)
+        return self._ctx[STORAGE_KEY]
 
     async def _remove_kbd(self) -> None:
         if self.current_stack().last_message_id is None:
             return
         await self.message_manager.remove_kbd(
-            bot=self._ctx.bot,
+            bot=self._ctx["bot"],
             old_message=self._get_last_message(),
             show_mode=self._calc_show_mode(),
         )
@@ -209,7 +209,7 @@ class ManagerImpl(DialogManager):
         if self.is_event_simulated():
             return None
         return await self.message_manager.answer_callback(
-            bot=self._ctx.bot,
+            bot=self._ctx["bot"],
             callback=self.event.callback,
         )
 
@@ -219,10 +219,10 @@ class ManagerImpl(DialogManager):
         stack = self.current_stack()
         await storage.remove_context(stack.pop())
         if stack.empty():
-            setattr(self._ctx, CONTEXT_KEY, None)
+            self._ctx[CONTEXT_KEY] = None
         else:
             intent_id = stack.last_intent_id()
-            setattr(self._ctx, CONTEXT_KEY, await storage.load_context(intent_id))
+            self._ctx[CONTEXT_KEY] = await storage.load_context(intent_id)
         await storage.save_stack(stack)
 
     async def start(
@@ -254,7 +254,7 @@ class ManagerImpl(DialogManager):
         await storage.save_stack(stack)
         if remove_keyboard:
             await self._remove_kbd()
-        setattr(self._ctx, CONTEXT_KEY, None)
+        self._ctx[CONTEXT_KEY] = None
 
     async def _start_new_stack(
         self,
@@ -297,7 +297,7 @@ class ManagerImpl(DialogManager):
 
         context = stack.push(state, data)
         context.access_settings = deepcopy(access_settings)
-        setattr(self._ctx, CONTEXT_KEY, context)
+        self._ctx[CONTEXT_KEY] = context
         await self.dialog().process_start(self, data, state)
         new_context = self._current_context_unsafe()
         if new_context and context.id == new_context.id:
@@ -313,7 +313,7 @@ class ManagerImpl(DialogManager):
         if new_dialog.launch_mode is LaunchMode.SINGLE_TOP:  # noqa: SIM102
             if new_dialog is old_dialog:
                 await self.storage().remove_context(self.current_stack().pop())
-                setattr(self._ctx, CONTEXT_KEY, None)
+                self._ctx[CONTEXT_KEY] = None
 
     async def next(self, show_mode: Optional[ShowMode] = None) -> None:
         context = self.current_context()
@@ -376,7 +376,7 @@ class ManagerImpl(DialogManager):
     async def show(self, show_mode: Optional[ShowMode] = None) -> None:
         try:
             stack = self.current_stack()
-            bot = self._ctx.bot
+            bot = self._ctx["bot"]
             old_message = self._get_last_message()
             if self.show_mode is ShowMode.NO_UPDATE:
                 logger.debug("ShowMode is NO_UPDATE, skip rendering")
@@ -507,7 +507,7 @@ class ManagerImpl(DialogManager):
 
     def _get_fake_chat(self, chat_id: Optional[int] = None) -> Chat:
         """Get Chat if we have info about him or FakeChat instead."""
-        if current_chat := getattr(self._ctx, UPDATE_CONTEXT_KEY, None):
+        if current_chat := self._ctx.get(UPDATE_CONTEXT_KEY):
             if chat_id in (None, current_chat.id):
                 return current_chat
         elif chat_id is None:

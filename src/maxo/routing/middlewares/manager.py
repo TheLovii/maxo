@@ -17,9 +17,9 @@ def _partial_middleware(
     middleware: BaseMiddleware[_UpdateT],
     next: NextMiddleware[_UpdateT],
 ) -> NextMiddleware[_UpdateT]:
-    async def wrapper(ctx: Ctx[_UpdateT]) -> Any:
+    async def wrapper(ctx: Ctx) -> Any:
         return await middleware(
-            update=ctx.update,
+            update=ctx["update"],
             ctx=ctx,
             next=next,
         )
@@ -48,7 +48,7 @@ class MiddlewareManager(Generic[_UpdateT]):
 
     def _make_chain(
         self,
-        trigger: Callable[[Ctx[_UpdateT]], Awaitable[_ReturnT]],
+        trigger: Callable[[Ctx], Awaitable[_ReturnT]],
     ) -> NextMiddleware[_UpdateT]:
         middleware = cast("NextMiddleware[_UpdateT]", trigger)
 

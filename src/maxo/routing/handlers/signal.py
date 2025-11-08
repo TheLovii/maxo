@@ -1,4 +1,5 @@
-from typing import Generic, Protocol, TypeVar
+from inspect import signature
+from typing import Any, Generic, Protocol, TypeVar
 
 from maxo.routing.ctx import Ctx
 from maxo.routing.filters.always import AlwaysTrueFilter
@@ -11,7 +12,7 @@ _ReturnT_co = TypeVar("_ReturnT_co", covariant=True)
 
 
 class SignalHandlerFn(Protocol[_SignalT, _ReturnT_co]):
-    async def __call__(self, ctx: Ctx[_SignalT]) -> _ReturnT_co: ...
+    async def __call__(self, **kwargs: Any) -> _ReturnT_co: ...
 
 
 class SignalHandler(
@@ -20,7 +21,7 @@ class SignalHandler(
 ):
     __slots__ = (
         "_filter",
-        "_handler_fn",
+        "handler_fn",
     )
 
     def __init__(
@@ -32,16 +33,27 @@ class SignalHandler(
             filter = AlwaysTrueFilter()
 
         self._filter = filter
-        self._handler_fn = handler_fn
+        self.handler_fn = handler_fn
 
     def __repr__(self) -> str:
         return (
             f"{self.__class__.__name__}"
-            f"(handler_fn={self._handler_fn}, filter={self._filter})"
+            f"(handler_fn={self.handler_fn}, filter={self._filter})"
         )
 
-    async def execute_filter(self, ctx: Ctx[_SignalT]) -> bool:
-        return await self._filter(ctx.update, ctx)
+    def _prepare_kwargs(self, ctx: Ctx) -> dict[str, Any]:
+        spec = signature(self.handler_fn)
+        varkw = any(
+            param.kind == param.VAR_KEYWORD for param in spec.parameters.values()
+        )
 
-    async def __call__(self, ctx: Ctx[_SignalT]) -> _ReturnT_co:
-        return await self._handler_fn(ctx=ctx)
+        if varkw:
+            return ctx
+
+        return {k: ctx[k] for k in spec.parameters if k in ctx}
+
+    async def execute_filter(self, ctx: Ctx) -> bool:
+        return await self._filter(ctx["update"], ctx)
+
+    async def __call__(self, ctx: Ctx) -> _ReturnT_co:
+        return await self.handler_fn(**self._prepare_kwargs(ctx))

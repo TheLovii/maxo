@@ -1,3 +1,4 @@
+from inspect import signature
 from typing import Any, Generic, Protocol, TypeVar, runtime_checkable
 
 from maxo.routing.ctx import Ctx
@@ -16,7 +17,7 @@ class UpdateHandlerFn(Protocol[_UpdateT, _ReturnT_co]):
         self,
         update: _UpdateT,
         /,
-        ctx: Ctx[_UpdateT],
+        **kwargs: Any,
     ) -> _ReturnT_co: ...
 
 
@@ -46,9 +47,19 @@ class UpdateHandler(
             f"(handler_fn={self._handler_fn}, filter={self._filter})"
         )
 
-    async def execute_filter(self, ctx: Ctx[_UpdateT]) -> bool:
-        return await self._filter(ctx.update, ctx)
+    def _prepare_kwargs(self, ctx: Ctx) -> dict[str, Any]:
+        spec = signature(self._handler_fn)
+        varkw = any(
+            param.kind == param.VAR_KEYWORD for param in spec.parameters.values()
+        )
 
-    async def __call__(self, ctx: Ctx[_UpdateT, Any]) -> _ReturnT_co:
-        handler_fn_result = await self._handler_fn(ctx.update, ctx=ctx)
-        return handler_fn_result
+        if varkw:
+            return ctx
+
+        return {k: ctx[k] for k in spec.parameters if k in ctx}
+
+    async def execute_filter(self, ctx: Ctx) -> bool:
+        return await self._filter(ctx["update"], ctx)
+
+    async def __call__(self, ctx: Ctx) -> _ReturnT_co:
+        return await self._handler_fn(ctx["update"], **self._prepare_kwargs(ctx))

@@ -134,15 +134,15 @@ class SimpleRouter(Router):
         self._state.ensure_include()
         self.children_routers.extend(routers)
 
-    async def trigger_child(self, ctx: Ctx[_UpdateT]) -> Any:
+    async def trigger_child(self, ctx: Ctx) -> Any:
         for child_router in self.children_routers:
             result = await child_router.trigger(ctx)
             if result is UNHANDLED:
                 continue
         return UNHANDLED
 
-    async def trigger(self, ctx: Ctx[_UpdateT]) -> Any:
-        observer = self.observers.get(ctx.update_tp)
+    async def trigger(self, ctx: Ctx) -> Any:
+        observer = self.observers.get(type(ctx["update"]))
         if observer is None:
             return await self.trigger_child(ctx)
 
@@ -159,7 +159,9 @@ class SimpleRouter(Router):
         else:
             return result
 
-    async def _emit_before_startup_handler(self, ctx: Ctx[BeforeStartup]) -> None:
+    async def _emit_before_startup_handler(
+        self,
+    ) -> None:
         self._state = StartedRouterState()
 
         for observer in self.observers.values():
@@ -168,7 +170,7 @@ class SimpleRouter(Router):
             observer.middleware.inner._state = StartedMiddlewareManagerState()
             observer.middleware.outer._state = StartedMiddlewareManagerState()
 
-    async def _emit_before_shutdown_handler(self, ctx: Ctx[BeforeShutdown]) -> None:
+    async def _emit_before_shutdown_handler(self) -> None:
         self._state = EmptyRouterState()
 
         for observer in self.observers.values():

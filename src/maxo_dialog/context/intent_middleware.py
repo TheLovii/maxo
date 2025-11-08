@@ -52,7 +52,7 @@ FORBIDDEN_STACK_KEY = "aiogd_stack_forbidden"
 
 def event_context_from_callback(event: MessageCallback, ctx: Ctx) -> EventContext:
     return EventContext(
-        bot=ctx.bot,
+        bot=ctx["bot"],
         user=event.callback.user,
         user_id=event.callback.user.user_id,
         chat_id=event.unsafe_message.recipient.chat_id,
@@ -63,7 +63,7 @@ def event_context_from_callback(event: MessageCallback, ctx: Ctx) -> EventContex
 
 def event_context_from_message(event: MessageCreated, ctx: Ctx) -> EventContext:
     return EventContext(
-        bot=ctx.bot,
+        bot=ctx["bot"],
         user=event.message.sender,
         user_id=event.message.sender.user_id,
         chat=None,
@@ -180,13 +180,13 @@ class IntentMiddlewareFactory:
                 stack.id,
                 proxy.user_id,
             )
-            setattr(ctx, FORBIDDEN_STACK_KEY, True)
+            ctx[FORBIDDEN_STACK_KEY] = True
             await proxy.unlock()
             return
 
-        setattr(ctx, STORAGE_KEY, proxy)
-        setattr(ctx, STACK_KEY, stack)
-        setattr(ctx, CONTEXT_KEY, context)
+        ctx[STORAGE_KEY] = proxy
+        ctx[STACK_KEY] = stack
+        ctx[CONTEXT_KEY] = context
 
     async def _load_context_by_intent(
         self,
@@ -222,13 +222,13 @@ class IntentMiddlewareFactory:
                 stack.id,
                 proxy.user_id,
             )
-            setattr(ctx, FORBIDDEN_STACK_KEY, True)
+            ctx[FORBIDDEN_STACK_KEY] = True
             await proxy.unlock()
             return
 
-        setattr(ctx, STORAGE_KEY, proxy)
-        setattr(ctx, STACK_KEY, stack)
-        setattr(ctx, CONTEXT_KEY, context)
+        ctx[STORAGE_KEY] = proxy
+        ctx[STACK_KEY] = stack
+        ctx[CONTEXT_KEY] = context
 
     async def _load_default_context(
         self,
@@ -238,7 +238,7 @@ class IntentMiddlewareFactory:
     ) -> None:
         return await self._load_context_by_stack(
             event=event,
-            proxy=self.storage_proxy(event_context, ctx.fsm_storage),
+            proxy=self.storage_proxy(event_context, ctx["fsm_storage"]),
             stack_id=DEFAULT_STACK_ID,
             ctx=ctx,
         )
@@ -250,13 +250,13 @@ class IntentMiddlewareFactory:
     ) -> Optional[str]:
         if not (
             event.message.link
-            and event.message.link.sender.id == ctx.bot.state.info.user_id
+            and event.message.link.sender.id == ctx["bot"].state.info.user_id
             and event.message.link.message.reply_markup.buttons
         ):
             return None
         for row in event.message.link.message.reply_markup.buttons:
             for button in row:
-                if getattr(button, "payload", None):
+                if button.payload:
                     intent_id, _ = remove_intent_id(button.payload)
                     return intent_id
         return None
@@ -268,7 +268,7 @@ class IntentMiddlewareFactory:
         next: NextMiddleware,
     ) -> Any:
         event_context = event_context_from_message(update, ctx)
-        setattr(ctx, EVENT_CONTEXT_KEY, event_context)
+        ctx[EVENT_CONTEXT_KEY] = event_context
 
         text, payload = split_reply_callback(update.message.unsafe_body.text)
         if payload:
@@ -284,14 +284,14 @@ class IntentMiddlewareFactory:
                 from_user=update.message.from_user,
                 # we cannot know real chat instance
                 chat_instance=str(update.message.chat.id),
-            ).as_(ctx.bot)
-            router: Router = ctx.event_router
+            ).as_(ctx["bot"])
+            router: Router = ctx["event_router"]
             return await router.trigger(ctx)
 
         if intent_id := self._intent_id_from_reply(update, ctx):
             await self._load_context_by_intent(
                 event=update,
-                proxy=self.storage_proxy(event_context, ctx.fsm_storage),
+                proxy=self.storage_proxy(event_context, ctx["fsm_storage"]),
                 intent_id=intent_id,
                 ctx=ctx,
             )
@@ -306,19 +306,19 @@ class IntentMiddlewareFactory:
         next: NextMiddleware,
     ) -> Any:
         event_context = event_context_from_aiogd(update)
-        setattr(ctx, EVENT_CONTEXT_KEY, event_context)
+        ctx[EVENT_CONTEXT_KEY] = event_context
 
         if update.intent_id:
             await self._load_context_by_intent(
                 event=update,
-                proxy=self.storage_proxy(event_context, ctx.fsm_storage),
+                proxy=self.storage_proxy(event_context, ctx["fsm_storage"]),
                 intent_id=update.intent_id,
                 ctx=ctx,
             )
         else:
             await self._load_context_by_stack(
                 event=update,
-                proxy=self.storage_proxy(event_context, ctx.fsm_storage),
+                proxy=self.storage_proxy(event_context, ctx["fsm_storage"]),
                 stack_id=update.stack_id,
                 ctx=ctx,
             )
@@ -330,29 +330,29 @@ class IntentMiddlewareFactory:
         ctx: Ctx,
         next: NextMiddleware,
     ) -> Any:
-        if not hasattr(ctx, UPDATE_CONTEXT_KEY):
+        if UPDATE_CONTEXT_KEY not in ctx:
             return await next(ctx)
 
         event_context = event_context_from_callback(update, ctx)
-        setattr(ctx, EVENT_CONTEXT_KEY, event_context)
+        ctx[EVENT_CONTEXT_KEY] = event_context
         original_data = update.callback.payload
         if original_data:
             intent_id, payload = remove_intent_id(original_data)
             if intent_id:
                 await self._load_context_by_intent(
                     event=update,
-                    proxy=self.storage_proxy(event_context, ctx.fsm_storage),
+                    proxy=self.storage_proxy(event_context, ctx["fsm_storage"]),
                     intent_id=intent_id,
                     ctx=ctx,
                 )
             else:
                 await self._load_default_context(update, ctx, event_context)
-            ctx.payload = original_data
+            ctx["payload"] = original_data
         else:
             await self._load_default_context(update, ctx, event_context)
         result = await next(ctx)
-        if result is UNHANDLED and getattr(ctx, FORBIDDEN_STACK_KEY, False):
-            facade = cast(MessageCallbackFacade, ctx.facade)
+        if result is UNHANDLED and ctx.get(FORBIDDEN_STACK_KEY):
+            facade = cast(MessageCallbackFacade, ctx["facade"])
             await facade.callback_answer(notification="")
         return result
 
@@ -374,10 +374,10 @@ async def context_saver_middleware(
     next: NextMiddleware,
 ) -> Any:
     result = await next(ctx)
-    proxy: StorageProxy = getattr(ctx, STORAGE_KEY, None)
+    proxy: StorageProxy = ctx.get(STORAGE_KEY)
     if proxy:
-        await proxy.save_context(getattr(ctx, CONTEXT_KEY, None))
-        await proxy.save_stack(getattr(ctx, STACK_KEY, None))
+        await proxy.save_context(ctx.get(CONTEXT_KEY))
+        await proxy.save_stack(ctx.get(STACK_KEY))
     return result
 
 
@@ -386,7 +386,7 @@ async def context_unlocker_middleware(
     ctx: Ctx,
     next: NextMiddleware,
 ) -> Any:
-    proxy: StorageProxy = getattr(ctx, STORAGE_KEY, None)
+    proxy: StorageProxy = ctx.get(STORAGE_KEY)
     try:
         result = await next(ctx)
     finally:
@@ -416,9 +416,9 @@ class IntentErrorMiddleware(BaseMiddleware[ExceptionEvent]):
             return False
         if not isinstance(update.update, SUPPORTED_ERROR_EVENTS):
             return False
-        if not hasattr(ctx, UPDATE_CONTEXT_KEY):
+        if UPDATE_CONTEXT_KEY not in ctx:
             return False
-        if not hasattr(ctx, EVENT_FROM_USER_KEY):
+        if EVENT_FROM_USER_KEY not in ctx:
             return False
         return True
 
@@ -469,16 +469,16 @@ class IntentErrorMiddleware(BaseMiddleware[ExceptionEvent]):
 
         try:
             event_context = event_context_from_error(update)
-            setattr(ctx, EVENT_CONTEXT_KEY, event_context)
+            ctx[EVENT_CONTEXT_KEY] = event_context
             proxy = StorageProxy(
                 bot=event_context.bot,
-                storage=ctx.fsm_storage,
+                storage=ctx["fsm_storage"],
                 events_isolation=self.events_isolation,
                 state_groups=self.registry.states_groups(),
                 user_id=event_context.user.id,
                 chat_id=event_context.chat_id,
             )
-            setattr(ctx, STORAGE_KEY, proxy)
+            ctx[STORAGE_KEY] = proxy
             stack = await self._load_stack(proxy, update.error)
             if stack.empty() or isinstance(error, UnknownState):
                 context = None
@@ -494,22 +494,22 @@ class IntentErrorMiddleware(BaseMiddleware[ExceptionEvent]):
                 update.update.update,
                 ctx,
             ):
-                setattr(ctx, STACK_KEY, stack)
-                setattr(ctx, CONTEXT_KEY, context)
+                ctx[STACK_KEY] = stack
+                ctx[CONTEXT_KEY] = context
             else:
                 logger.debug(
                     "Stack %s is not allowed for user %s",
                     stack.id,
                     proxy.user_id,
                 )
-                setattr(ctx, FORBIDDEN_STACK_KEY, True)
+                ctx[FORBIDDEN_STACK_KEY] = True
                 await proxy.unlock()
             return await next(ctx)
         finally:
-            proxy: StorageProxy = getattr(ctx, STORAGE_KEY, None)
+            proxy: StorageProxy = ctx.get(STORAGE_KEY)
             if proxy:
                 await proxy.unlock()
-                context = getattr(ctx, CONTEXT_KEY, None)
+                context = ctx.get(CONTEXT_KEY)
                 if context is not None:
                     await proxy.save_context(context)
-                await proxy.save_stack(getattr(ctx, STACK_KEY, None))
+                await proxy.save_stack(ctx.get(STACK_KEY))

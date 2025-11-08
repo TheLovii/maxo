@@ -32,7 +32,7 @@ class MyMiddleware(BaseMiddleware[MaxUpdate]):
         ctx: Ctx,
         next: NextMiddleware,
     ) -> None:
-        ctx.my_key = "my_value"
+        ctx["my_key"] = "my_value"
         return await next(ctx)
 
 

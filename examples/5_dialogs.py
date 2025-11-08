@@ -3,7 +3,7 @@ import os
 from time import time
 from typing import Any
 
-from maxo import Bot, Ctx, Dispatcher, SimpleRouter
+from maxo import Bot, Dispatcher, SimpleRouter
 from maxo.fsm import State, StatesGroup
 from maxo.fsm.key_builder import DefaultKeyBuilder
 from maxo.fsm.storages.memory import MemoryStorage, SimpleEventIsolation
@@ -61,7 +61,6 @@ start_router = SimpleRouter(name=__name__)
 @start_router.message_created()
 async def start(
     message: MessageCreated,
-    ctx: Ctx,
     dialog_manager: DialogManager,
 ) -> None:
     await dialog_manager.start(

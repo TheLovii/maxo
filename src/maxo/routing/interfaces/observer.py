@@ -58,7 +58,6 @@ class Observer(Protocol[_UpdateT, _HandlerT, _HandlerFnT]):
         self,
         handler_fn: _HandlerFnT,
         filter: Filter[_UpdateT] | None = None,
-        inline_ctx: Callable | None = None,  # TODO: Типизация
     ) -> _HandlerFnT:
         raise NotImplementedError
 
@@ -67,17 +66,17 @@ class Observer(Protocol[_UpdateT, _HandlerT, _HandlerFnT]):
         raise NotImplementedError
 
     @abstractmethod
-    async def execute_filter(self, ctx: Ctx[_UpdateT]) -> bool:
+    async def execute_filter(self, ctx: Ctx) -> bool:
         raise NotImplementedError
 
     @abstractmethod
-    async def handler_lookup(self, ctx: Ctx[_UpdateT]) -> Any:
+    async def handler_lookup(self, ctx: Ctx) -> Any:
         raise NotImplementedError
 
     @abstractmethod
     async def execute_handler(
         self,
-        ctx: Ctx[_UpdateT],
+        ctx: Ctx,
         handler: _HandlerT,
     ) -> _ReturnT_co:
         raise NotImplementedError

@@ -32,8 +32,8 @@ _ParamsP = ParamSpec("_ParamsP")
 _UpdateT = TypeVar("_UpdateT", bound=BaseUpdate)
 _SignalT = TypeVar("_SignalT", bound=BaseSignal)
 
-_SignalHandlerFn = Callable[Concatenate[Ctx[_SignalT], _ParamsP], _ReturnT]
-_UpdateHandlerFn = Callable[Concatenate[_UpdateT, Ctx[_UpdateT], _ParamsP], _ReturnT]
+_SignalHandlerFn = Callable[Concatenate[Ctx, _ParamsP], _ReturnT]
+_UpdateHandlerFn = Callable[Concatenate[_UpdateT, Ctx, _ParamsP], _ReturnT]
 
 
 @overload
@@ -52,7 +52,7 @@ def inject(func: Any) -> Any:
     return wrap_injection(
         func=func,
         is_async=True,
-        container_getter=lambda args, kwargs: getattr(kwargs["ctx"], CONTAINER_NAME),
+        container_getter=lambda args, kwargs: kwargs["ctx"][CONTAINER_NAME],
     )
 
 
@@ -79,19 +79,18 @@ class DishkaMiddleware(BaseMiddleware[Update[Any]]):
     async def __call__(
         self,
         update: Update[Any],
-        ctx: Ctx[Update[Any]],
+        ctx: Ctx,
         next: NextMiddleware[Update[Any]],
     ) -> Any:
         async with self._container(
             {
                 Update[Any]: update,
                 Update[type(update.update)]: update,  # type: ignore[misc]
-                Ctx[Update[Any], Any]: ctx,
-                Ctx[Update[type(update.update)], Any]: ctx,  # type: ignore[misc]
+                Ctx: ctx,
             }
             | self._extra_context,
         ) as container:
-            setattr(ctx, CONTAINER_NAME, container)
+            ctx[CONTAINER_NAME] = container
             return await next(ctx)
 
 
@@ -99,15 +98,13 @@ class MaxoProvider(Provider):
     scope = Scope.REQUEST
 
     context = (
-        from_context(Bot)
-        + from_context(Dispatcher)
-        + from_context(UpdateContext)
-        + from_context(BaseStorage)
-        + from_context(FSMContext)
-        + from_context(RawState)
-        + from_context(Update[Any])
-        + from_context(Update[_UpdateT])
-        + from_context(Update[Any])
-        + from_context(Ctx[Update[Any], Any])
-        + from_context(Ctx[Update[_UpdateT], Any])
+        from_context(provides=Bot)
+        + from_context(provides=Dispatcher)
+        + from_context(provides=UpdateContext)
+        + from_context(provides=BaseStorage)
+        + from_context(provides=FSMContext)
+        + from_context(provides=RawState)
+        + from_context(provides=Update[Any])
+        + from_context(provides=Update[_UpdateT])
+        + from_context(provides=Ctx)
     )

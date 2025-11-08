@@ -24,7 +24,7 @@ class UserRegistatorStatesGroup(StatesGroup):
 @router.message_created(CommandStart())
 async def start_handler(
     update: MessageCreated,
-    ctx: Ctx[MessageCreated],
+    ctx: Ctx,
     facade: MessageCreatedFacade,
     state: FSMContext,
 ) -> None:
@@ -38,7 +38,7 @@ async def start_handler(
 )
 async def input_name_handler(
     update: MessageCreated,
-    ctx: Ctx[MessageCreated],
+    ctx: Ctx,
     facade: MessageCreatedFacade,
     state: FSMContext,
 ) -> None:
@@ -64,7 +64,7 @@ async def input_name_handler(
 )
 async def input_age_handler(
     update: MessageCreated,
-    ctx: Ctx[MessageCreated],
+    ctx: Ctx,
     facade: MessageCreatedFacade,
     state: FSMContext,
 ) -> None:

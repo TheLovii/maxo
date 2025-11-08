@@ -39,7 +39,7 @@ class Command(BaseFilter[MessageCreated]):
     async def __call__(
         self,
         update: MessageCreated,
-        ctx: Ctx[MessageCreated],
+        ctx: Ctx,
     ) -> bool:
         if not isinstance(update, MessageCreated):
             return False
@@ -53,12 +53,12 @@ class Command(BaseFilter[MessageCreated]):
         try:
             command = self.parse_command(
                 text=update.message.body.text,
-                me_username=cast("str", ctx.bot.state.info.username),
+                me_username=cast("str", ctx["bot"].state.info.username),
             )
         except CommandParseError:
             return False
 
-        ctx.state.command = command
+        ctx["command"] = command
 
         return True
 

@@ -15,8 +15,8 @@ class StateFilter(BaseFilter[Any]):
     ) -> None:
         self._states = states
 
-    async def __call__(self, update: Any, ctx: Ctx[Any]) -> bool:
-        raw_state = ctx.raw_state
+    async def __call__(self, update: Any, ctx: Ctx) -> bool:
+        raw_state = ctx.get("raw_state")
 
         for state in self._states:
             if (isinstance(state, str) or state is None) and (

@@ -22,11 +22,11 @@ class FacadeMiddleware(BaseMiddleware[Update[Any]]):
     async def __call__(
         self,
         update: Update[Any],
-        ctx: Ctx[Update[Any]],
+        ctx: Ctx,
         next: NextMiddleware[Update[Any]],
     ) -> Any:
         facade = self._facade_cls_factory(type(update.update))
-        ctx.facade = facade(ctx.bot, update.update)
+        ctx["facade"] = facade(ctx["bot"], update.update)
 
         return await next(ctx)
 

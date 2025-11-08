@@ -16,7 +16,7 @@ class ErrorMiddleware(BaseMiddleware[Any]):
     async def __call__(
         self,
         update: Any,
-        ctx: Ctx[Any],
+        ctx: Ctx,
         next: NextMiddleware[Any],
     ) -> Any:
         try:
@@ -26,8 +26,9 @@ class ErrorMiddleware(BaseMiddleware[Any]):
                 error=error,
                 update=update,
             )
-            ctx = Ctx.factory(exception_event, ctx.raw_data)
-            result = await self._router.trigger(ctx)
+            new_ctx = ctx.copy()
+            new_ctx["update"] = exception_event
+            result = await self._router.trigger(new_ctx)
             if result is UNHANDLED:
                 raise
             return result

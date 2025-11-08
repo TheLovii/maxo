@@ -27,6 +27,6 @@ class ExceptionFilter(BaseFilter[ExceptionEvent[_ExceptionT]], Generic[_Exceptio
     async def __call__(
         self,
         update: ExceptionEvent[Any],
-        ctx: Ctx[ExceptionEvent[Any]],
+        ctx: Ctx,
     ) -> bool:
         return self._handler(update.error)

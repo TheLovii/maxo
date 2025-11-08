@@ -26,12 +26,12 @@ class FSMContextMiddleware(BaseMiddleware[Update[Any]]):
     async def __call__(
         self,
         update: Update[Any],
-        ctx: Ctx[Update[Any]],
+        ctx: Ctx,
         next: NextMiddleware[Update[Any]],
     ) -> Any:
         storage_key = self.make_storage_key(
-            bot_id=ctx.bot.state.info.user_id,
-            update_context=ctx.update_context,
+            bot_id=ctx["bot"].state.info.user_id,
+            update_context=ctx["update_context"],
         )
         if storage_key is None:
             return await next(ctx)
@@ -41,10 +41,10 @@ class FSMContextMiddleware(BaseMiddleware[Update[Any]]):
                 key=storage_key,
                 storage=self._storage,
             )
-            ctx.storage = self._storage
-            ctx.fsm_context = fsm_context
-            ctx.fsm_storage = self._storage
-            ctx.raw_state = await fsm_context.get_state()
+            ctx["storage"] = self._storage
+            ctx["fsm_context"] = fsm_context
+            ctx["fsm_storage"] = self._storage
+            ctx["raw_state"] = await fsm_context.get_state()
 
             return await next(ctx)
 

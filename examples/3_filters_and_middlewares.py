@@ -14,7 +14,7 @@ class OuterMiddleware(BaseMiddleware[MessageCreated]):
     async def __call__(
         self,
         update: MessageCreated,
-        ctx: Ctx[MessageCreated],
+        ctx: Ctx,
         next: NextMiddleware[MessageCreated],
     ) -> Any:
         print("Исполнится перед фильтрами")  # noqa: T201
@@ -27,7 +27,7 @@ class InnerMiddleware(BaseMiddleware[MessageCreated]):
     async def __call__(
         self,
         update: MessageCreated,
-        ctx: Ctx[MessageCreated],
+        ctx: Ctx,
         next: NextMiddleware[MessageCreated],
     ) -> Any:
         print("Исполнится перед хендлером")  # noqa: T201
@@ -43,7 +43,7 @@ class ContainsTextFilter(BaseFilter[MessageCreated]):
     async def __call__(
         self,
         update: MessageCreated,
-        ctx: Ctx[MessageCreated],
+        ctx: Ctx,
     ) -> bool:
         if update.message.body is None:
             return False
@@ -64,7 +64,7 @@ dispatcher.message_created.middleware.outer(OuterMiddleware())
 )
 async def echo_handler(
     update: MessageCreated,
-    ctx: Ctx[MessageCreated],
+    ctx: Ctx,
     facade: MessageCreatedFacade,
 ) -> None:
     print("Исполнение хендлера")  # noqa: T201

@@ -10,7 +10,7 @@ class _AlwaysBooleanFilter(BaseFilter[Any]):
     async def __call__(
         self,
         update: Any,
-        ctx: Ctx[Any],
+        ctx: Ctx,
     ) -> bool:
         return self._boolean
 

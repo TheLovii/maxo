@@ -39,12 +39,12 @@ class ManagerMiddleware(BaseMiddleware[MaxUpdate]):
                 registry=self.registry,
                 router=self.router,
             )
-            setattr(ctx, MANAGER_KEY, dialog_manager)
+            ctx[MANAGER_KEY] = dialog_manager
 
         try:
             return await next(ctx)
         finally:
-            manager: DialogManager | None = getattr(ctx, MANAGER_KEY, None)
+            manager: DialogManager | None = ctx.get(MANAGER_KEY)
             if manager:
                 await manager.close_manager()
 
@@ -52,7 +52,7 @@ class ManagerMiddleware(BaseMiddleware[MaxUpdate]):
         self,
         ctx: Ctx,
     ) -> bool:
-        return hasattr(ctx, STORAGE_KEY)
+        return STORAGE_KEY in ctx
 
 
 class BgFactoryMiddleware(BaseMiddleware[MaxUpdate]):
@@ -69,5 +69,5 @@ class BgFactoryMiddleware(BaseMiddleware[MaxUpdate]):
         ctx: Ctx,
         next: NextMiddleware,
     ) -> Any:
-        setattr(ctx, BG_FACTORY_KEY, self.bg_manager_factory)
+        ctx[BG_FACTORY_KEY] = self.bg_manager_factory
         return await next(ctx)

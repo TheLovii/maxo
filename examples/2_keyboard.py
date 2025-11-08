@@ -17,7 +17,7 @@ router = SimpleRouter()
 @router.message_created(CommandStart())
 async def start_handler(
     update: MessageCreated,
-    ctx: Ctx[MessageCreated],
+    ctx: Ctx,
     facade: MessageCreatedFacade,
 ) -> None:
     keyboard = (
@@ -45,7 +45,6 @@ async def start_handler(
 @router.message_callback(MagicFilter(F.callback_id == "click_me"))
 async def click_me_handler(
     update: MessageCallback,
-    ctx: Ctx[MessageCallback],
     facade: MessageCallbackFacade,
 ) -> None:
     await facade.callback_answer("Ты кликнул на меня")

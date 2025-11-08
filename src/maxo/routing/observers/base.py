@@ -11,7 +11,6 @@ from maxo.routing.middlewares.manager import MiddlewareManagerFacade
 from maxo.routing.observers.state import EmptyObserverState
 from maxo.routing.sentinels import UNHANDLED
 from maxo.routing.updates.base import BaseUpdate
-from maxo.routing.utils import inline_ctx as _inline_ctx
 
 _UpdateT = TypeVar("_UpdateT", bound=BaseUpdate)
 _ReturnT_co = TypeVar("_ReturnT_co", covariant=True)
@@ -62,10 +61,9 @@ class BaseObserver(Observer[_UpdateT, _HandlerT, _HandlerFnT], ABC):
     def __call__(
         self,
         filter: Filter[_UpdateT] | None = None,
-        inline_ctx: Callable[[_HandlerFunc], _HandlerFunc] | None = _inline_ctx,
     ) -> Callable[[_HandlerFnT], _HandlerFnT]:
         def wrapper(handler_fn: _HandlerFnT) -> _HandlerFnT:
-            return self.handler(handler_fn, filter, inline_ctx)
+            return self.handler(handler_fn, filter)
 
         return wrapper
 
@@ -74,10 +72,10 @@ class BaseObserver(Observer[_UpdateT, _HandlerT, _HandlerFnT], ABC):
 
         self._filter = filter
 
-    async def execute_filter(self, ctx: Ctx[_UpdateT]) -> bool:
-        return await self._filter(ctx.update, ctx)
+    async def execute_filter(self, ctx: Ctx) -> bool:
+        return await self._filter(ctx["update"], ctx)
 
-    async def handler_lookup(self, ctx: Ctx[_UpdateT]) -> Any:
+    async def handler_lookup(self, ctx: Ctx) -> Any:
         for handler in self._handlers:
             if await handler.execute_filter(ctx):
                 return await self.execute_handler(ctx, handler)
@@ -86,7 +84,7 @@ class BaseObserver(Observer[_UpdateT, _HandlerT, _HandlerFnT], ABC):
 
     async def execute_handler(
         self,
-        ctx: Ctx[_UpdateT],
+        ctx: Ctx,
         handler: _HandlerT,
     ) -> _ReturnT_co:
         chain_middlewares = self.middleware.inner._make_chain(handler)

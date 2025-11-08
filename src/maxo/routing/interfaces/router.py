@@ -45,9 +45,9 @@ class Router(Protocol):
         raise NotImplementedError
 
     @abstractmethod
-    async def trigger_child(self, ctx: Ctx[Any]) -> Any:
+    async def trigger_child(self, ctx: Ctx) -> Any:
         raise NotImplementedError
 
     @abstractmethod
-    async def trigger(self, ctx: Ctx[Any]) -> Any:
+    async def trigger(self, ctx: Ctx) -> Any:
         raise NotImplementedError

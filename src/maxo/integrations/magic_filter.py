@@ -17,10 +17,8 @@ class MagicData(BaseFilter[Any]):
     def __init__(self, magic_filter: OriginMagicFilter) -> None:
         self._magic_filter = magic_filter
 
-    async def __call__(self, update: Any, ctx: Ctx[Any]) -> bool:
-        result = self._magic_filter.resolve(
-            AttrDict({"update": update, **ctx.raw_data})
-        )
+    async def __call__(self, update: Any, ctx: Ctx) -> bool:
+        result = self._magic_filter.resolve(AttrDict({"update": update, **ctx}))
         return bool(result)
 
 
@@ -36,12 +34,12 @@ class MagicFilter(BaseFilter[Any]):
         self._result_key = result_key
         self._magic_filter = magic_filter.cast(bool)
 
-    async def __call__(self, update: Any, ctx: Ctx[Any]) -> bool:
+    async def __call__(self, update: Any, ctx: Ctx) -> bool:
         result = self._magic_filter.resolve(update)
         if not result:
             return False
 
         if self._result_key is not None:
-            setattr(ctx.state, self._result_key, result)
+            ctx[self._result_key] = result
 
         return True

@@ -24,11 +24,11 @@ class UpdateContextMiddleware(BaseMiddleware[Update[Any]]):
     async def __call__(
         self,
         update: Update[Any],
-        ctx: Ctx[Update[Any]],
+        ctx: Ctx,
         next: NextMiddleware[Update[Any]],
     ) -> Any:
         update_context = self._resolve_update_context(update.update)
-        setattr(ctx, UPDATE_CONTEXT_ATTR, update_context)
+        ctx[UPDATE_CONTEXT_ATTR] = update_context
 
         return await next(ctx)
 

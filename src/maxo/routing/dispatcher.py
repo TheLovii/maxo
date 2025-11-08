@@ -15,7 +15,6 @@ from maxo.routing.observers.signal import SignalObserver
 from maxo.routing.routers.simple import SimpleRouter
 from maxo.routing.sentinels import UNHANDLED
 from maxo.routing.signals.base import BaseSignal
-from maxo.routing.signals.startup import BeforeStartup
 from maxo.routing.signals.update import Update
 from maxo.routing.updates.base import BaseUpdate
 from maxo.routing.utils._resolving_inner_middlewares import resolving_inner_middlewares
@@ -97,18 +96,19 @@ class Dispatcher(SimpleRouter):
         return await self.feed_update(signal, bot)
 
     async def feed_update(self, update: BaseUpdate, bot: Bot | None = None) -> Any:
-        ctx = Ctx.factory(update, {**self.workflow_data, "bot": bot})
+        ctx = Ctx({**self.workflow_data, "bot": bot, "update": update})
+        ctx["ctx"] = ctx
         return await self.trigger(ctx)
 
     async def _feed_update_handler(
         self,
-        ctx: Ctx[Update[Any]],
+        ctx: Ctx,
     ) -> Any:
-        ctx = Ctx.factory(ctx.update.update, ctx.raw_data)
+        ctx["update"] = ctx["update"].update
         return await self.trigger(ctx)
 
-    async def _emit_before_startup_handler(self, ctx: Ctx[BeforeStartup]) -> None:
+    async def _emit_before_startup_handler(self) -> None:
         validate_router_graph(self)
         resolving_inner_middlewares(self)
 
-        await super()._emit_before_startup_handler(ctx)
+        await super()._emit_before_startup_handler()

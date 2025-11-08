@@ -1,5 +1,6 @@
 from abc import abstractmethod
 from collections.abc import Sequence
+from copy import deepcopy
 from typing import Generic, TypeVar, final
 
 from maxo.routing.ctx import Ctx
@@ -17,17 +18,17 @@ class BaseLogicFilter(BaseFilter[_UpdateT], Generic[_UpdateT]):
         self._inlining()
 
     @final
-    async def __call__(self, update: _UpdateT, ctx: Ctx[_UpdateT]) -> bool:
-        copied_ctx = ctx.copy()
+    async def __call__(self, update: _UpdateT, ctx: Ctx) -> bool:
+        copied_ctx = deepcopy(ctx)
 
         reduce_result = await self._reduce(update, ctx)
         if reduce_result:
-            ctx.merge(copied_ctx)
+            ctx.update(copied_ctx)
 
         return reduce_result
 
     @abstractmethod
-    async def _reduce(self, update: _UpdateT, ctx: Ctx[_UpdateT]) -> bool:
+    async def _reduce(self, update: _UpdateT, ctx: Ctx) -> bool:
         raise NotImplementedError
 
     @abstractmethod
@@ -46,15 +47,15 @@ class AndFilter(BaseLogicFilter[_UpdateT], Generic[_UpdateT]):
         self._filters = filters
         super().__init__()
 
-    async def _reduce(self, update: _UpdateT, ctx: Ctx[_UpdateT]) -> bool:
+    async def _reduce(self, update: _UpdateT, ctx: Ctx) -> bool:
         for filter_ in self._filters:
-            loop_copied_ctx = ctx.copy()
+            loop_copied_ctx = deepcopy(ctx)
 
             filter_result = await filter_(update, loop_copied_ctx)
             if not filter_result:
                 return False
 
-            ctx.merge(loop_copied_ctx)
+            ctx.update(loop_copied_ctx)
 
         return True
 
@@ -81,13 +82,13 @@ class OrFilter(BaseLogicFilter[_UpdateT], Generic[_UpdateT]):
         self._filters = filters
         super().__init__()
 
-    async def _reduce(self, update: _UpdateT, ctx: Ctx[_UpdateT]) -> bool:
+    async def _reduce(self, update: _UpdateT, ctx: Ctx) -> bool:
         for filter_ in self._filters:
-            loop_copied_ctx = ctx.copy()
+            loop_copied_ctx = deepcopy(ctx)
 
             filter_result = await filter_(update, loop_copied_ctx)
             if filter_result:
-                ctx.merge(loop_copied_ctx)
+                ctx.update(loop_copied_ctx)
                 return True
 
         return False
@@ -115,7 +116,7 @@ class InvertFilter(BaseLogicFilter[_UpdateT], Generic[_UpdateT]):
         self._filter = filter_
         super().__init__()
 
-    async def _reduce(self, update: _UpdateT, ctx: Ctx[_UpdateT]) -> bool:
+    async def _reduce(self, update: _UpdateT, ctx: Ctx) -> bool:
         filter_result = await self._filter(update, ctx)
         if self._inlined:
             return filter_result

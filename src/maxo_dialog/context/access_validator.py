@@ -34,7 +34,7 @@ class DefaultAccessValidator(StackAccessValidator):
             return True
 
         # check user
-        user: User = getattr(ctx, EVENT_FROM_USER_KEY)
+        user: User = ctx[EVENT_FROM_USER_KEY]
         if user.id in access_settings.user_ids:
             return True
 
