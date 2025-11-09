@@ -12,7 +12,7 @@ from maxo.routing.middlewares.event_context import EventContextMiddleware
 from maxo.routing.middlewares.fsm_context import FSMContextMiddleware
 from maxo.routing.middlewares.update_context import UpdateContextMiddleware
 from maxo.routing.observers.signal import SignalObserver
-from maxo.routing.routers.simple import SimpleRouter
+from maxo.routing.routers.simple import Router
 from maxo.routing.sentinels import UNHANDLED
 from maxo.routing.signals.base import BaseSignal
 from maxo.routing.signals.update import Update
@@ -22,7 +22,7 @@ from maxo.routing.utils.validate_router_graph import validate_router_graph
 from maxo.tools.facades.middleware import FacadeMiddleware
 
 
-class Dispatcher(SimpleRouter):
+class Dispatcher(Router):
     update: SignalObserver[Update[Any]]
 
     def __init__(
@@ -31,7 +31,7 @@ class Dispatcher(SimpleRouter):
         workflow_data: MutableMapping[str, Any] | None = None,
         # State system settings
         storage: BaseStorage | None = None,
-        event_isolation: BaseEventIsolation | None = None,
+        events_isolation: BaseEventIsolation | None = None,
         key_builder: BaseKeyBuilder | None = None,
     ) -> None:
         super().__init__(self.__class__.__name__)
@@ -54,10 +54,10 @@ class Dispatcher(SimpleRouter):
         if storage is None:
             storage = MemoryStorage(key_builder=key_builder)
 
-        if event_isolation is None:
-            event_isolation = SimpleEventIsolation(key_builder=key_builder)
+        if events_isolation is None:
+            events_isolation = SimpleEventIsolation(key_builder=key_builder)
 
-        self.update.middleware.outer(FSMContextMiddleware(storage, event_isolation))
+        self.update.middleware.outer(FSMContextMiddleware(storage, events_isolation))
 
         # Facade settings
 

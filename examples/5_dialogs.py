@@ -3,7 +3,7 @@ import os
 from time import time
 from typing import Any
 
-from maxo import Bot, Dispatcher, SimpleRouter
+from maxo import Bot, Dispatcher, Router
 from maxo.fsm import State, StatesGroup
 from maxo.fsm.key_builder import DefaultKeyBuilder
 from maxo.fsm.storages.memory import MemoryStorage, SimpleEventIsolation
@@ -55,7 +55,7 @@ start_dialog = Dialog(
 )
 
 
-start_router = SimpleRouter(name=__name__)
+start_router = Router(name=__name__)
 
 
 @start_router.message_created()
@@ -76,16 +76,16 @@ def main() -> None:
 
     key_builder = DefaultKeyBuilder(with_destiny=True)
     storage = MemoryStorage(key_builder=key_builder)
-    event_isolation = SimpleEventIsolation(key_builder=key_builder)
+    events_isolation = SimpleEventIsolation(key_builder=key_builder)
 
     dispatcher = Dispatcher(
         storage=storage,
-        event_isolation=event_isolation,
+        events_isolation=events_isolation,
         key_builder=key_builder,
     )
 
     dispatcher.include(start_router, start_dialog)
-    setup_dialogs(dispatcher, events_isolation=event_isolation)
+    setup_dialogs(dispatcher, events_isolation=events_isolation)
 
     LongPolling(dispatcher).run(bot)
 

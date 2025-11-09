@@ -1,12 +1,12 @@
 from collections.abc import Callable, Iterable
 from typing import Optional, Union
 
-from maxo import SimpleRouter
+from maxo import Router
 from maxo.fsm import State, StatesGroup
 from maxo.fsm.state import any_state
 from maxo.fsm.storages.base import BaseEventIsolation
 from maxo.fsm.storages.memory import SimpleEventIsolation
-from maxo.routing.interfaces import Router
+from maxo.routing.interfaces import BaseRouter
 from maxo.routing.observers import UpdateObserver
 from maxo_dialog.api.entities import DialogUpdateEvent
 from maxo_dialog.api.exceptions import UnregisteredDialogError
@@ -38,17 +38,17 @@ from maxo_dialog.manager.update_handler import handle_update
 from .context.access_validator import DefaultAccessValidator
 
 
-def _setup_event_observer(router: SimpleRouter) -> None:
+def _setup_event_observer(router: Router) -> None:
     router.observers[DialogUpdateEvent] = UpdateObserver()
 
 
-def _register_event_handler(router: SimpleRouter, callback: Callable) -> None:
+def _register_event_handler(router: Router, callback: Callable) -> None:
     handler = router.observers[DialogUpdateEvent]
     handler.handler(callback, any_state)
 
 
 class DialogRegistry(DialogRegistryProtocol):
-    def __init__(self, router: SimpleRouter):
+    def __init__(self, router: Router):
         self.router = router
         self._loaded = False
         self._dialogs = {}
@@ -99,7 +99,7 @@ def _startup_callback(
 
 
 def _register_middleware(
-    router: SimpleRouter,
+    router: Router,
     dialog_manager_factory: DialogManagerFactory,
     bg_manager_factory: BgManagerFactory,
     stack_access_validator: StackAccessValidator,
@@ -191,7 +191,7 @@ def _prepare_events_isolation(
         return SimpleEventIsolation()
 
 
-def collect_dialogs(router: Router) -> Iterable[DialogProtocol]:
+def collect_dialogs(router: BaseRouter) -> Iterable[DialogProtocol]:
     if isinstance(router, DialogProtocol):
         yield router
     for sub_router in router.children_routers:
@@ -199,7 +199,7 @@ def collect_dialogs(router: Router) -> Iterable[DialogProtocol]:
 
 
 def setup_dialogs(
-    router: SimpleRouter,
+    router: Router,
     *,
     dialog_manager_factory: Optional[DialogManagerFactory] = None,
     message_manager: Optional[MessageManagerProtocol] = None,

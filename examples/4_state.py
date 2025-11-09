@@ -3,7 +3,7 @@ import os
 
 from magic_filter import F
 
-from maxo import Bot, Dispatcher, SimpleRouter
+from maxo import Bot, Dispatcher, Router
 from maxo.enums import TextFormat
 from maxo.fsm import FSMContext, State, StateFilter, StatesGroup
 from maxo.integrations.magic_filter import MagicFilter
@@ -13,7 +13,7 @@ from maxo.routing.updates.message_created import MessageCreated
 from maxo.tools.facades import MessageCreatedFacade
 from maxo.tools.long_polling.long_polling import LongPolling
 
-router = SimpleRouter(__name__)
+router = Router(__name__)
 
 
 class UserRegistatorStatesGroup(StatesGroup):

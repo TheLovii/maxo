@@ -1,5 +1,5 @@
 try:
-    from redis.asyncio import Redis
+    from redis.asyncio import ConnectionPool, Redis
     from redis.asyncio.lock import Lock
     from redis.typing import ExpiryT
 except ImportError as e:
@@ -96,6 +96,26 @@ class RedisStorage(BaseStorage):
 
     async def close(self) -> None:
         await self.redis.aclose()
+
+    @classmethod
+    def from_url(
+        cls,
+        url: str,
+        connection_kwargs: dict[str, Any] | None = None,
+        **kwargs: Any,
+    ) -> "RedisStorage":
+        if connection_kwargs is None:
+            connection_kwargs = {}
+        pool = ConnectionPool.from_url(url, **connection_kwargs)
+        redis = Redis(connection_pool=pool)
+        return cls(redis=redis, **kwargs)
+
+    def create_isolation(self, **kwargs: Any) -> "RedisEventIsolation":
+        return RedisEventIsolation(
+            redis=self.redis,
+            key_builder=self.key_builder,
+            **kwargs,
+        )
 
 
 DEFAULT_REDIS_LOCK_KWARGS = {"timeout": 60}

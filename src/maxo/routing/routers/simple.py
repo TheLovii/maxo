@@ -3,7 +3,7 @@ from typing import Any, TypeVar
 
 from maxo.routing.ctx import Ctx
 from maxo.routing.interfaces.observer import Observer
-from maxo.routing.interfaces.router import Router, RouterState
+from maxo.routing.interfaces.router import BaseRouter, RouterState
 from maxo.routing.middlewares.state import (
     EmptyMiddlewareManagerState,
     StartedMiddlewareManagerState,
@@ -13,7 +13,7 @@ from maxo.routing.observers.state import EmptyObserverState, StartedObserverStat
 from maxo.routing.observers.update import UpdateObserver
 from maxo.routing.routers.state import EmptyRouterState, StartedRouterState
 from maxo.routing.sentinels import UNHANDLED
-from maxo.routing.signals.exception import ExceptionEvent
+from maxo.routing.signals.exception import ErrorEvent
 from maxo.routing.signals.shutdown import AfterShutdown, BeforeShutdown
 from maxo.routing.signals.startup import AfterStartup, BeforeStartup
 from maxo.routing.updates.base import BaseUpdate
@@ -33,7 +33,7 @@ from maxo.routing.utils.get_default_name import get_router_default_name
 _UpdateT = TypeVar("_UpdateT", bound=BaseUpdate)
 
 
-class SimpleRouter(Router):
+class Router(BaseRouter):
     bot_added: UpdateObserver[BotAdded]
     bot_removed: UpdateObserver[BotRemoved]
     bot_started: UpdateObserver[BotStarted]
@@ -46,7 +46,7 @@ class SimpleRouter(Router):
     user_added: UpdateObserver[UserAdded]
     user_removed: UpdateObserver[UserRemoved]
 
-    exception: SignalObserver[ExceptionEvent[Any]]
+    exception: SignalObserver[ErrorEvent[Any]]
     before_startup: SignalObserver[BeforeStartup]
     after_startup: SignalObserver[AfterStartup]
     before_shutdown: SignalObserver[BeforeShutdown]
@@ -69,7 +69,9 @@ class SimpleRouter(Router):
         self.user_added = UpdateObserver[UserAdded]()
         self.user_removed = UpdateObserver[UserRemoved]()
 
-        self.exception = SignalObserver[ExceptionEvent[Any]]()
+        self.exception = self.exceptions = self.error = self.errors = SignalObserver[
+            ErrorEvent[Any]
+        ]()
 
         self.before_startup = SignalObserver[BeforeStartup]()
         self.before_startup.handler(self._emit_before_startup_handler)
@@ -93,7 +95,7 @@ class SimpleRouter(Router):
             MessageRemoved: self.message_removed,
             UserAdded: self.user_added,
             UserRemoved: self.user_removed,
-            ExceptionEvent: self.exception,
+            ErrorEvent: self.exception,
             BeforeStartup: self.before_startup,
             AfterStartup: self.after_startup,
             BeforeShutdown: self.before_shutdown,
@@ -104,7 +106,7 @@ class SimpleRouter(Router):
             name = get_router_default_name()
 
         self._name = name
-        self._children_routers: MutableSequence[Router] = []
+        self._children_routers: MutableSequence[BaseRouter] = []
         self.__state = EmptyRouterState()
 
     def __repr__(self) -> str:
@@ -127,10 +129,10 @@ class SimpleRouter(Router):
         return self._observers
 
     @property
-    def children_routers(self) -> MutableSequence[Router]:
+    def children_routers(self) -> MutableSequence[BaseRouter]:
         return self._children_routers
 
-    def include(self, *routers: Router) -> None:
+    def include(self, *routers: BaseRouter) -> None:
         self._state.ensure_include()
         self.children_routers.extend(routers)
 

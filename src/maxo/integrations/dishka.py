@@ -32,19 +32,22 @@ _ParamsP = ParamSpec("_ParamsP")
 _UpdateT = TypeVar("_UpdateT", bound=BaseUpdate)
 _SignalT = TypeVar("_SignalT", bound=BaseSignal)
 
-_SignalHandlerFn = Callable[Concatenate[Ctx, _ParamsP], _ReturnT]
-_UpdateHandlerFn = Callable[Concatenate[_UpdateT, Ctx, _ParamsP], _ReturnT]
+# FIXME
+# _SignalHandlerFn = Callable[_ParamsP, _ReturnT]
+# _UpdateHandlerFn = Callable[[Concatenate[_UpdateT, _ParamsP]], _ReturnT]
 
 
+# FIXME
 @overload
 def inject(
-    func: _SignalHandlerFn[_SignalT, _ParamsP, _ReturnT],
+    func,  # _SignalHandlerFn[_SignalT, _ParamsP, _ReturnT],
 ) -> SignalHandlerFn[_SignalT, _ReturnT]: ...
 
 
+# FIXME
 @overload
 def inject(
-    func: _UpdateHandlerFn[_UpdateT, _ParamsP, _ReturnT],
+    func, # : _UpdateHandlerFn[_UpdateT, _ParamsP, _ReturnT],
 ) -> UpdateHandlerFn[_UpdateT, _ReturnT]: ...
 
 
@@ -57,8 +60,8 @@ def inject(func: Any) -> Any:
 
 
 def setup_dishka(
-    dispatcher: Dispatcher,
     container: AsyncContainer,
+    dispatcher: Dispatcher,
     auto_inject: bool,
     extra_context: dict[Any, Any] | None = None,
 ) -> None:
@@ -71,7 +74,7 @@ class DishkaMiddleware(BaseMiddleware[Update[Any]]):
     __slots__ = ("_container", "_extra_context")
 
     def __init__(
-        self, container: AsyncContainer, extra_context: dict[Any, Any] | None = None
+        self, container: AsyncContainer, extra_context: dict[Any, Any] | None = None,
     ) -> None:
         self._container = container
         self._extra_context = extra_context or {}

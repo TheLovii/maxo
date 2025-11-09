@@ -1,11 +1,11 @@
 from typing import Sequence, overload
 
 from maxo.enums import UpdateType
-from maxo.routing.interfaces.router import Router
+from maxo.routing.interfaces.router import BaseRouter
 from maxo.routing.updates.base import MaxUpdate
 
 
-def _collect_used_updates_type(router: Router) -> set[UpdateType]:
+def _collect_used_updates_type(router: BaseRouter) -> set[UpdateType]:
     used_updates = set()
     for update_tp, observer in router.observers.items():
         if (
@@ -20,19 +20,19 @@ def _collect_used_updates_type(router: Router) -> set[UpdateType]:
 
 @overload
 def collect_used_updates(
-    router: Router,
+    router: BaseRouter,
 ) -> Sequence[str]: ...
 
 
 @overload
 def collect_used_updates(
-    router: Router,
+    router: BaseRouter,
     used_updates: set[UpdateType],
 ) -> Sequence[str]: ...
 
 
 def collect_used_updates(
-    router: Router,
+    router: BaseRouter,
     used_updates: set[UpdateType] | None = None,
 ) -> Sequence[str]:
     if used_updates is None:

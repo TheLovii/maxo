@@ -1,12 +1,12 @@
 from maxo.errors.api import (
     MaxBotApiError,
     MaxBotBadRequestError,
+    MaxBotForbiddenError,
     MaxBotMethodNotAllowedError,
     MaxBotNotFoundError,
     MaxBotServiceUnavailableError,
     MaxBotTooManyRequestsError,
     MaxBotUnauthorizedError,
-    MaxVotForbiddenError,
     RetvalReturnedServerException,
 )
 from maxo.errors.base import MaxoError, maxo_error
@@ -18,12 +18,12 @@ __all__ = (
     "CycleRoutersError",
     "MaxBotApiError",
     "MaxBotBadRequestError",
+    "MaxBotForbiddenError",
     "MaxBotMethodNotAllowedError",
     "MaxBotNotFoundError",
     "MaxBotServiceUnavailableError",
     "MaxBotTooManyRequestsError",
     "MaxBotUnauthorizedError",
-    "MaxVotForbiddenError",
     "MaxoError",
     "RetvalReturnedServerException",
     "maxo_error",

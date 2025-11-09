@@ -2,7 +2,7 @@ from abc import abstractmethod
 from typing import Protocol
 
 from maxo import Ctx
-from maxo.routing.interfaces import Router
+from maxo.routing.interfaces import BaseRouter
 from maxo_dialog.api.entities import ChatEvent
 from maxo_dialog.api.protocols import (
     DialogManager,
@@ -17,6 +17,6 @@ class DialogManagerFactory(Protocol):
         event: ChatEvent,
         ctx: Ctx,
         registry: DialogRegistryProtocol,
-        router: Router,
+        router: BaseRouter,
     ) -> DialogManager:
         raise NotImplementedError

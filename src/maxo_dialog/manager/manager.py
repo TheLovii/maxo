@@ -7,9 +7,9 @@ from typing import Any, Optional, cast
 from maxo import Ctx
 from maxo.enums import ChatStatusType, ChatType
 from maxo.fsm import State
-from maxo.routing.interfaces import Router
+from maxo.routing.interfaces import BaseRouter
 from maxo.routing.middlewares.event_context import UPDATE_CONTEXT_KEY
-from maxo.routing.signals.exception import ExceptionEvent
+from maxo.routing.signals.exception import ErrorEvent
 from maxo.routing.updates import MessageCallback
 from maxo.types import (
     Chat,
@@ -70,7 +70,7 @@ class ManagerImpl(DialogManager):
         message_manager: MessageManagerProtocol,
         media_id_storage: MediaIdStorageProtocol,
         registry: DialogRegistryProtocol,
-        router: Router,
+        router: BaseRouter,
         ctx: Ctx,
     ):
         self.disabled = False
@@ -439,7 +439,7 @@ class ManagerImpl(DialogManager):
             )
 
     def _get_last_message(self) -> Optional[OldMessage]:
-        if isinstance(self.event, ExceptionEvent):
+        if isinstance(self.event, ErrorEvent):
             event = self.event.update.event
         else:
             event = self.event

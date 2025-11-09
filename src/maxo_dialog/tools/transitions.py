@@ -6,7 +6,7 @@ from diagrams import Cluster, Diagram, Edge
 from diagrams.custom import Custom
 
 from maxo.fsm import State
-from maxo.routing.interfaces import Router
+from maxo.routing.interfaces import BaseRouter
 from maxo_dialog.api.internal import WindowProtocol
 from maxo_dialog.setup import collect_dialogs
 from maxo_dialog.widgets.kbd import (
@@ -100,7 +100,7 @@ def render_window(
 
 
 def render_transitions(
-    router: Router,
+    router: BaseRouter,
     title: str = "Maxo Dialog",
     filename: str = "maxo_dialog",
     format: str = "png",

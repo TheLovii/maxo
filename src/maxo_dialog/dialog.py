@@ -8,11 +8,11 @@ from typing import (
     Union,
 )
 
-from maxo import SimpleRouter
+from maxo import Router
 from maxo.enums import ChatType
 from maxo.fsm import State, StatesGroup
 from maxo.routing.ctx import Ctx
-from maxo.routing.interfaces import Router
+from maxo.routing.interfaces import BaseRouter
 from maxo.routing.middlewares.event_context import UPDATE_CONTEXT_KEY
 from maxo.routing.updates import MessageCallback
 from maxo.types import Callback
@@ -40,7 +40,7 @@ OnResultEvent = Callable[[Data, Any, DialogManager], Awaitable]
 W = TypeVar("W", bound=Widget)
 
 
-class Dialog(SimpleRouter, DialogProtocol):
+class Dialog(Router, DialogProtocol):
     def __init__(
         self,
         *windows: WindowProtocol,
@@ -240,7 +240,7 @@ class Dialog(SimpleRouter, DialogProtocol):
                 manager,
             )
 
-    def include_router(self, router: Router) -> Router:
+    def include_router(self, router: BaseRouter) -> BaseRouter:
         raise TypeError("Dialog cannot include routers")
 
     async def process_close(

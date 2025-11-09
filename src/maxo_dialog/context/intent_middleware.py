@@ -3,13 +3,13 @@ from typing import Any, Optional, cast
 
 from maxo.fsm.storages.base import BaseEventIsolation, BaseStorage
 from maxo.routing.ctx import Ctx
-from maxo.routing.interfaces import BaseMiddleware, NextMiddleware, Router
+from maxo.routing.interfaces import BaseMiddleware, BaseRouter, NextMiddleware
 from maxo.routing.middlewares.event_context import (
     EVENT_FROM_USER_KEY,
     UPDATE_CONTEXT_KEY,
 )
 from maxo.routing.sentinels import UNHANDLED
-from maxo.routing.signals.exception import ExceptionEvent
+from maxo.routing.signals.exception import ErrorEvent
 from maxo.routing.updates.base import MaxUpdate
 from maxo.routing.updates.message_callback import MessageCallback
 from maxo.routing.updates.message_created import MessageCreated
@@ -83,7 +83,7 @@ def event_context_from_aiogd(event: DialogUpdateEvent) -> EventContext:
     )
 
 
-def event_context_from_error(event: ExceptionEvent, ctx: Ctx) -> EventContext:
+def event_context_from_error(event: ErrorEvent, ctx: Ctx) -> EventContext:
     # TODO: ???
     if isinstance(event.update, MessageCreated):
         return event_context_from_message(event.update, ctx)
@@ -285,7 +285,7 @@ class IntentMiddlewareFactory:
                 # we cannot know real chat instance
                 chat_instance=str(update.message.chat.id),
             ).as_(ctx["bot"])
-            router: Router = ctx["event_router"]
+            router: BaseRouter = ctx["event_router"]
             return await router.trigger(ctx)
 
         if intent_id := self._intent_id_from_reply(update, ctx):
@@ -395,7 +395,7 @@ async def context_unlocker_middleware(
     return result
 
 
-class IntentErrorMiddleware(BaseMiddleware[ExceptionEvent]):
+class IntentErrorMiddleware(BaseMiddleware[ErrorEvent]):
     def __init__(
         self,
         registry: DialogRegistryProtocol,
@@ -409,7 +409,7 @@ class IntentErrorMiddleware(BaseMiddleware[ExceptionEvent]):
 
     def _is_error_supported(
         self,
-        update: ExceptionEvent,
+        update: ErrorEvent,
         ctx: Ctx,
     ) -> bool:
         if isinstance(update, InvalidStackIdError):
@@ -459,7 +459,7 @@ class IntentErrorMiddleware(BaseMiddleware[ExceptionEvent]):
 
     async def __call__(
         self,
-        update: ExceptionEvent,
+        update: ErrorEvent,
         ctx: Ctx,
         next: NextMiddleware,
     ) -> Any:

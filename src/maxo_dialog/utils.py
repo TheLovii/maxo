@@ -1,7 +1,7 @@
 from logging import getLogger
 from typing import Optional, Union
 
-from maxo.routing.signals.exception import ExceptionEvent
+from maxo.routing.signals.exception import ErrorEvent
 from maxo.types import (
     Callback,
     CallbackKeyboardButton,
@@ -113,7 +113,7 @@ def get_chat(event: ChatEvent) -> Chat:
         if not event.message:
             return Chat(id=event.from_user.id, type="")
         return event.message.chat
-    elif isinstance(event, ExceptionEvent):
+    elif isinstance(event, ErrorEvent):
         upd_event = event.update.event
         if hasattr(upd_event, "chat"):
             return upd_event.chat

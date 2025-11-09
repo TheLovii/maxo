@@ -12,7 +12,7 @@ class RouterState(Protocol):
         raise NotImplementedError
 
 
-class Router(Protocol):
+class BaseRouter(Protocol):
     __slots__ = ()
 
     @property
@@ -37,11 +37,11 @@ class Router(Protocol):
 
     @property
     @abstractmethod
-    def children_routers(self) -> Sequence["Router"]:
+    def children_routers(self) -> Sequence["BaseRouter"]:
         raise NotImplementedError
 
     @abstractmethod
-    def include(self, *routers: "Router") -> None:
+    def include(self, *routers: "BaseRouter") -> None:
         raise NotImplementedError
 
     @abstractmethod

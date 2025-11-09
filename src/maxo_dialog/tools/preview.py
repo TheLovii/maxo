@@ -8,7 +8,7 @@ from jinja2 import Environment, PackageLoader, select_autoescape
 
 from maxo.enums import AttachmentType
 from maxo.fsm import State, StatesGroup
-from maxo.routing.interfaces import Router
+from maxo.routing.interfaces import BaseRouter
 from maxo.routing.middlewares.event_context import (
     EVENT_FROM_USER_KEY,
     UPDATE_CONTEXT_KEY,
@@ -456,7 +456,7 @@ async def render_dialog(
 
 
 async def render_preview_content(
-    router: Router,
+    router: BaseRouter,
     simulate_events: bool = False,
 ) -> str:
     fake_manager = FakeManager()
@@ -478,7 +478,7 @@ async def render_preview_content(
 
 
 async def render_preview(
-    router: Router,
+    router: BaseRouter,
     file: str,
     simulate_events: bool = False,
 ):

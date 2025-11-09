@@ -3,7 +3,7 @@ import os
 
 from magic_filter import F
 
-from maxo import Bot, Ctx, Dispatcher, SimpleRouter
+from maxo import Bot, Ctx, Dispatcher, Router
 from maxo.integrations.magic_filter import MagicFilter
 from maxo.routing.filters import CommandStart
 from maxo.routing.updates import MessageCallback, MessageCreated
@@ -11,7 +11,7 @@ from maxo.tools.builders import KeyboardBuilder
 from maxo.tools.facades import MessageCallbackFacade, MessageCreatedFacade
 from maxo.tools.long_polling.long_polling import LongPolling
 
-router = SimpleRouter()
+router = Router()
 
 
 @router.message_created(CommandStart())

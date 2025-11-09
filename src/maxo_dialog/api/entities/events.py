@@ -3,7 +3,7 @@ from typing import Any, Union
 
 from maxo import Bot
 from maxo.enums import ChatType
-from maxo.routing.signals.exception import ExceptionEvent
+from maxo.routing.signals.exception import ErrorEvent
 from maxo.routing.updates import MessageCallback, MessageCreated, UserAdded, UserRemoved
 from maxo.types import Chat, User
 
@@ -14,7 +14,7 @@ ChatEvent = Union[
     UserAdded,
     UserRemoved,
     DialogUpdateEvent,
-    ExceptionEvent[Any],
+    ErrorEvent[Any],
     MessageCreated,
 ]
 

@@ -3,12 +3,12 @@ from typing import TYPE_CHECKING, Sequence
 from maxo.errors.base import MaxoError, maxo_error
 
 if TYPE_CHECKING:
-    from maxo.routing.interfaces.router import Router
+    from maxo.routing.interfaces.router import BaseRouter
 
 
 @maxo_error
 class CycleRoutersError(MaxoError):
-    routers: Sequence["Router"]
+    routers: Sequence["BaseRouter"]
 
     def __str__(self) -> str:
         details = self._render_details()

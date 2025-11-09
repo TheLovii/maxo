@@ -11,17 +11,17 @@ from maxo.types.update_context import UpdateContext
 
 class FSMContextMiddleware(BaseMiddleware[Update[Any]]):
     __slots__ = (
-        "_event_isolation",
+        "_events_isolation",
         "_storage",
     )
 
     def __init__(
         self,
         storage: BaseStorage,
-        event_isolation: BaseEventIsolation,
+        events_isolation: BaseEventIsolation,
     ) -> None:
         self._storage = storage
-        self._event_isolation = event_isolation
+        self._events_isolation = events_isolation
 
     async def __call__(
         self,
@@ -36,7 +36,7 @@ class FSMContextMiddleware(BaseMiddleware[Update[Any]]):
         if storage_key is None:
             return await next(ctx)
 
-        async with self._event_isolation.lock(key=storage_key):
+        async with self._events_isolation.lock(key=storage_key):
             fsm_context = FSMContext(
                 key=storage_key,
                 storage=self._storage,

@@ -32,12 +32,12 @@ from maxo.enums import (
 )
 from maxo.errors.api import (
     MaxBotBadRequestError,
+    MaxBotForbiddenError,
     MaxBotMethodNotAllowedError,
     MaxBotNotFoundError,
     MaxBotServiceUnavailableError,
     MaxBotTooManyRequestsError,
     MaxBotUnauthorizedError,
-    MaxVotForbiddenError,
     RetvalReturnedServerException,
 )
 from maxo.routing.updates.bot_added import BotAdded
@@ -255,7 +255,7 @@ class MaxApiClient(AiohttpClient):
         if response.status_code == 401:
             raise MaxBotUnauthorizedError(code, message)
         if response.status_code == 403:
-            raise MaxVotForbiddenError(code, message)
+            raise MaxBotForbiddenError(code, message)
         if response.status_code == 404:
             raise MaxBotNotFoundError(code, message)
         if response.status_code == 405:

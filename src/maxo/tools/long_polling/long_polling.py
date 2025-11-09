@@ -66,6 +66,7 @@ class LongPolling:
         dispatcher = self._dispatcher
         dispatcher.workflow_data.update(bot=bot, **workflow_data)
 
+        # TODO: Вынести это в метод и рецепт реторты
         types = ",".join(sorted(types or collect_used_updates(self._dispatcher)))
 
         async with self._lock:

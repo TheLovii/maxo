@@ -1,5 +1,5 @@
 from maxo import Ctx
-from maxo.routing.interfaces import Router
+from maxo.routing.interfaces import BaseRouter
 from maxo_dialog.api.entities import ChatEvent
 from maxo_dialog.api.internal import DialogManagerFactory
 from maxo_dialog.api.protocols import (
@@ -26,7 +26,7 @@ class DefaultManagerFactory(DialogManagerFactory):
         event: ChatEvent,
         ctx: Ctx,
         registry: DialogRegistryProtocol,
-        router: Router,
+        router: BaseRouter,
     ) -> DialogManager:
         return ManagerImpl(
             event=event,

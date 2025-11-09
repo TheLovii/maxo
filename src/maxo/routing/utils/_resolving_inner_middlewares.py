@@ -2,12 +2,12 @@ from collections import defaultdict
 from typing import Any, MutableMapping, MutableSequence, overload
 
 from maxo.routing.interfaces.middleware import BaseMiddleware
-from maxo.routing.interfaces.router import Router
+from maxo.routing.interfaces.router import BaseRouter
 from maxo.routing.updates.base import BaseUpdate
 
 
 def resolve_middlewares(
-    router: Router,
+    router: BaseRouter,
     middlewares_map: MutableMapping[
         type[BaseUpdate], MutableSequence[BaseMiddleware[Any]]
     ],
@@ -22,13 +22,13 @@ def resolve_middlewares(
 
 @overload
 def resolving_inner_middlewares(
-    router: Router,
+    router: BaseRouter,
 ) -> None: ...
 
 
 @overload
 def resolving_inner_middlewares(
-    router: Router,
+    router: BaseRouter,
     middlewares_map: MutableMapping[
         type[BaseUpdate], MutableSequence[BaseMiddleware[Any]]
     ],
@@ -36,7 +36,7 @@ def resolving_inner_middlewares(
 
 
 def resolving_inner_middlewares(
-    router: Router,
+    router: BaseRouter,
     middlewares_map: (
         MutableMapping[type[BaseUpdate], MutableSequence[BaseMiddleware[Any]]] | None
     ) = None,

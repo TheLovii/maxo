@@ -1,7 +1,7 @@
 from typing import Any
 
 from maxo.routing.ctx import Ctx
-from maxo.routing.interfaces import BaseMiddleware, NextMiddleware, Router
+from maxo.routing.interfaces import BaseMiddleware, BaseRouter, NextMiddleware
 from maxo.routing.updates.base import MaxUpdate
 from maxo_dialog.api.internal import STORAGE_KEY, DialogManagerFactory
 from maxo_dialog.api.protocols import (
@@ -19,7 +19,7 @@ class ManagerMiddleware(BaseMiddleware[MaxUpdate]):
         self,
         dialog_manager_factory: DialogManagerFactory,
         registry: DialogRegistryProtocol,
-        router: Router,
+        router: BaseRouter,
     ) -> None:
         super().__init__()
         self.dialog_manager_factory = dialog_manager_factory

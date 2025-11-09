@@ -5,7 +5,7 @@ from typing import Any, Optional
 from maxo import Bot, Dispatcher
 from maxo.enums import ChatStatusType, ChatType
 from maxo.fsm import State
-from maxo.routing.interfaces import Router
+from maxo.routing.interfaces import BaseRouter
 from maxo.types import User
 from maxo_dialog.api.entities import (
     DEFAULT_STACK_ID,
@@ -204,7 +204,7 @@ class BgManager(BaseDialogManager):
 
 
 class BgManagerFactoryImpl(BgManagerFactory):
-    def __init__(self, router: Router):
+    def __init__(self, router: BaseRouter):
         self._router = router
 
     def bg(

@@ -2,25 +2,25 @@ from copy import copy
 from typing import MutableSequence, overload
 
 from maxo.errors.routing import CycleRoutersError
-from maxo.routing.interfaces.router import Router
+from maxo.routing.interfaces.router import BaseRouter
 
 
 @overload
 def validate_router_graph(
-    router: Router,
+    router: BaseRouter,
 ) -> None: ...
 
 
 @overload
 def validate_router_graph(
-    router: Router,
-    visited_routers: MutableSequence[Router],
+    router: BaseRouter,
+    visited_routers: MutableSequence[BaseRouter],
 ) -> None: ...
 
 
 def validate_router_graph(
-    router: Router,
-    visited_routers: MutableSequence[Router] | None = None,
+    router: BaseRouter,
+    visited_routers: MutableSequence[BaseRouter] | None = None,
 ) -> None:
     if visited_routers is None:
         visited_routers = []
