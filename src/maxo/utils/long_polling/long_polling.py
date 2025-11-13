@@ -28,7 +28,6 @@ class LongPolling:
     ) -> None:
         self._dispatcher = dispatcher
         self._backoff_config = backoff_config
-
         self._lock = asyncio.Lock()
 
     def run(
@@ -39,6 +38,7 @@ class LongPolling:
         marker: Omittable[int | None] = Omitted(),
         types: Omittable[Sequence[str]] = Omitted(),
         auto_close_bot: bool = True,
+        drop_pending_updates: bool = False,
         **workflow_data: Any,
     ) -> None:
         asyncio.run(
@@ -49,6 +49,7 @@ class LongPolling:
                 marker=marker,
                 types=types,
                 auto_close_bot=auto_close_bot,
+                drop_pending_updates=drop_pending_updates,
                 **workflow_data,
             ),
         )
@@ -60,6 +61,7 @@ class LongPolling:
         limit: Omittable[int] = 100,
         marker: Omittable[int | None] = Omitted(),
         types: Omittable[Sequence[str]] = Omitted(),
+        drop_pending_updates: bool = False,
         **workflow_data: Any,
     ) -> None:
         dispatcher = self._dispatcher
@@ -84,6 +86,7 @@ class LongPolling:
                     limit=limit,
                     marker=marker,
                     types=types,
+                    drop_pending_updates=drop_pending_updates,
                 )
 
                 with contextlib.suppress(KeyboardInterrupt):
@@ -101,6 +104,7 @@ class LongPolling:
 
         await dispatcher.feed_signal(AfterShutdown())
 
+    # TODO: Нормальный drop_pending_updates?
     async def _get_updates(
         self,
         bot: Bot,
@@ -108,6 +112,7 @@ class LongPolling:
         limit: Omittable[int] = 100,
         marker: Omittable[int | None] = Omitted(),
         types: Omittable[str] = Omitted(),
+        drop_pending_updates: bool = False,
     ) -> AsyncIterator[Update[Any]]:
         backoff = Backoff(self._backoff_config)
         bot_id = bot.state.info.user_id
@@ -118,7 +123,7 @@ class LongPolling:
             try:
                 result = await bot.get_updates(
                     limit=limit,
-                    timeout=timeout,
+                    timeout=timeout if not drop_pending_updates else 3,
                     marker=marker,
                     types=types,
                 )
@@ -149,8 +154,14 @@ class LongPolling:
                 backoff.reset()
                 failed = False
 
+            marker = result.marker
+
+            if drop_pending_updates:
+                for update in result.updates:
+                    loggers.long_polling.debug("Skip update: %s", update)
+                drop_pending_updates = False
+                continue
+
             for update in result.updates:
                 loggers.long_polling.debug("New update: %s", update)
                 yield Update(update=update, marker=result.marker)
-
-            marker = result.marker

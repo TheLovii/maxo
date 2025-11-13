@@ -397,10 +397,8 @@ class Multiselect(StatefulSelect[T], Generic[T]):
     ) -> bool:
         item_id = str(self.item_id_getter(data["item"]))
         if manager.is_preview():
-            return (
-                # just stupid way to make it differ in preview
-                ord(item_id[-1]) % 2 == 1
-            )
+            # just stupid way to make it differ in preview
+            return ord(item_id[-1]) % 2 != 0
         return self.is_checked(item_id, manager)
 
     def is_checked(

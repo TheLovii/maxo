@@ -103,7 +103,7 @@ class Command(BaseFilter[MessageCreated]):
         try:
             full_command, *args = text.split(maxsplit=1)
         except ValueError as e:
-            raise CommandException("not enough values to unpack")  from e
+            raise CommandException("not enough values to unpack") from e
 
         prefix, (command, _, mention) = full_command[0], full_command[1:].partition("@")
         return CommandObject(
