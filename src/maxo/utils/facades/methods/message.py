@@ -2,9 +2,9 @@ import asyncio
 from abc import ABC, abstractmethod
 from collections.abc import Sequence
 
+from maxo import loggers
 from maxo.bot.method_results.messages.delete_message import DeleteMessageResult
 from maxo.enums import MessageLinkType, TextFormat, UploadType
-from maxo.loggers import utils as logger
 from maxo.omit import Omittable, Omitted
 from maxo.types import (
     AudioAttachmentRequest,
@@ -209,7 +209,7 @@ class MessageMethodsFacade(BaseMethodsFacade, ABC):
                 case UploadType.IMAGE:
                     attachments.append(ImageAttachmentRequest.factory(token=token))
                 case _:
-                    logger.warning("Received unknown attachment type: %s", type_)
+                    loggers.utils.warning("Received unknown attachment type: %s", type_)
 
         return attachments
 
