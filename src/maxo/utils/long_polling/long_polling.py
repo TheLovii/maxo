@@ -73,7 +73,7 @@ class LongPolling:
 
         async with self._lock:
             await dispatcher.feed_signal(BeforeStartup())
-            async with bot:
+            async with bot.context():
                 loggers.dispatcher.info(
                     "Polling started for @%s id=%s",
                     bot.state.info.username,

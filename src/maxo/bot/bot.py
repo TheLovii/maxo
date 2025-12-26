@@ -1,4 +1,5 @@
-from types import TracebackType
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 from typing import Any, Self, TypeVar
 
 from retejo.core.method_binder import bind_method
@@ -39,8 +40,9 @@ from maxo.bot.methods.upload.upload_media import UploadMedia
 from maxo.bot.state import (
     BotState,
     ClosedBotState,
+    ConnectingBotState,
     EmptyBotState,
-    InitialBotState,
+    RunningBotState,
 )
 from maxo.enums.text_fromat import TextFormat
 from maxo.types import ChatMember
@@ -50,8 +52,6 @@ _MethodResultT = TypeVar("_MethodResultT", bound=MaxoType)
 
 
 class Bot:
-    _state: BotState
-
     __slots__ = ("_state", "_text_format", "_token", "_warming_up")
 
     def __init__(
@@ -75,20 +75,19 @@ class Bot:
             return
 
         api_client = MaxApiClient(self._token, self._warming_up, self._text_format)
+        self._state = ConnectingBotState(api_client=api_client)
+
         info = await api_client.send_method(GetBotInfo())
-        self._state = InitialBotState(info=info, api_client=api_client)
+        self._state = RunningBotState(info=info, api_client=api_client)
 
-    async def __aenter__(self) -> Self:
-        await self.start()
-        return self
-
-    async def __aexit__(
-        self,
-        exc_type: type[BaseException] | None,
-        exc_value: BaseException | None,
-        traceback: TracebackType | None,
-    ) -> None:
-        await self.close()
+    @asynccontextmanager
+    async def context(self, auto_close: bool = True) -> AsyncIterator[Self]:
+        try:
+            await self.start()
+            yield self
+        finally:
+            if auto_close:
+                await self.close()
 
     async def send_method(
         self,

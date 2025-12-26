@@ -7,8 +7,6 @@ from maxo.types.bot_info import BotInfo
 
 
 class BotState(Protocol):
-    __slots__ = ()
-
     @property
     @abstractmethod
     def api_client(self) -> MaxApiClient:
@@ -66,15 +64,10 @@ class ClosedBotState(BotState):
         raise StateError("Bot closed")
 
 
-class InitialBotState(BotState):
-    __slots__ = ("_api_client", "_info")
+class ConnectingBotState(BotState):
+    __slots__ = ("_api_client",)
 
-    def __init__(
-        self,
-        info: BotInfo,
-        api_client: MaxApiClient,
-    ) -> None:
-        self._info = info
+    def __init__(self, api_client: MaxApiClient) -> None:
         self._api_client = api_client
 
     @property
@@ -88,6 +81,22 @@ class InitialBotState(BotState):
     @property
     def closed(self) -> bool:
         return False
+
+    @property
+    def info(self) -> BotInfo:
+        raise StateError("Bot is connecting")
+
+
+class RunningBotState(ConnectingBotState):
+    __slots__ = ("_info", "_api_client")
+
+    def __init__(
+        self,
+        info: BotInfo,
+        api_client: MaxApiClient,
+    ) -> None:
+        super().__init__(api_client=api_client)
+        self._info = info
 
     @property
     def info(self) -> BotInfo:
